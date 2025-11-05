@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const requestSchema = new mongoose.Schema({
   requestNumber: {
     type: String,
-    unique: true,
     required: false // Will be generated in pre-save hook
+    // unique index is defined below using schema.index()
   },
   project: {
     type: mongoose.Schema.Types.ObjectId,
