@@ -1,28 +1,19 @@
+# Render.com Configuration
+# ضع هذا الملف في root directory إذا كان Backend في مجلد server
+
 services:
-  # Backend Service
   - type: web
-    name: construction-api
+    name: construction-backend
     env: node
     plan: free
-    rootDir: server  # ⚠️ مهم جداً - Backend موجود في مجلد server/
-    buildCommand: npm install
-    startCommand: node server.js
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
       - key: MONGODB_URI
-        sync: false  # ⚠️ يجب إضافته يدوياً في Dashboard - Connection String من MongoDB Atlas
-    
-  # Frontend Service
-  - type: web
-    name: construction-frontend
-    env: static
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./build
-    envVars:
-      - key: REACT_APP_API_URL
-        sync: false  # يجب إضافته يدوياً في Dashboard
-
-
+        sync: false  # ستحتاج لإضافته يدوياً في Render Dashboard
+      - key: JWT_SECRET
+        sync: false  # ستحتاج لإضافته يدوياً في Render Dashboard
