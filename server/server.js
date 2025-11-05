@@ -8,9 +8,37 @@ const PORT = process.env.PORT || 4000;
 
 // CORS Configuration - يسمح بالوصول من أي مصدر في Production
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? '*' // في Production، اتركه مفتوحاً أو ضع Domains محددة
-    : 'http://localhost:3000', // في Development
+  origin: function (origin, callback) {
+    // قائمة بالـ Origins المسموحة
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://nuimie.netlify.app',
+      'https://*.netlify.app', // أي Netlify subdomain
+      'https://*.vercel.app', // أي Vercel subdomain
+      'https://*.render.com' // أي Render subdomain
+    ];
+    
+    // في Development، السماح فقط بـ localhost
+    if (process.env.NODE_ENV === 'development' || !origin) {
+      if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        return callback(null, true);
+      }
+    }
+    
+    // في Production، السماح بالـ Origins المسموحة
+    if (!origin || allowedOrigins.some(allowed => {
+      if (allowed.includes('*')) {
+        const pattern = allowed.replace('*', '.*');
+        return new RegExp(pattern).test(origin);
+      }
+      return origin === allowed;
+    })) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
