@@ -6,55 +6,15 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// CORS Configuration - يسمح بالوصول من أي مصدر
+// CORS Configuration - يسمح بالوصول من أي مصدر في Production
 const corsOptions = {
-  origin: function (origin, callback) {
-    // قائمة بالـ Origins المسموحة
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://127.0.0.1:3000',
-      'https://nuimie.netlify.app'
-    ];
-    
-    // السماح بجميع Netlify subdomains
-    const isNetlifyApp = origin && origin.includes('.netlify.app');
-    const isVercelApp = origin && origin.includes('.vercel.app');
-    const isRenderApp = origin && origin.includes('.render.com');
-    
-    // السماح إذا كان:
-    // 1. لا يوجد origin (مثل Postman أو curl)
-    // 2. في قائمة المسموحة
-    // 3. Netlify subdomain
-    // 4. Vercel subdomain
-    // 5. Render subdomain
-    if (!origin || 
-        allowedOrigins.includes(origin) || 
-        isNetlifyApp || 
-        isVercelApp || 
-        isRenderApp) {
-      callback(null, true);
-    } else {
-      console.log('CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: process.env.NODE_ENV === 'production' 
+    ? '*' // في Production، اتركه مفتوحاً أو ضع Domains محددة
+    : 'http://localhost:3000', // في Development
   credentials: true,
-  optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-ngrok-skip-browser-warning']
+  optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
-
-// Middleware للتعامل مع Ngrok headers
-app.use((req, res, next) => {
-  // Skip Ngrok browser warning - إضافة جميع headers المطلوبة
-  if (req.headers['x-ngrok-skip-browser-warning'] || req.headers['ngrok-skip-browser-warning']) {
-    res.setHeader('x-ngrok-skip-browser-warning', 'true');
-    res.setHeader('ngrok-skip-browser-warning', 'true');
-  }
-  next();
-});
 
 // زيادة حد حجم الطلب لدعم الصور الكبيرة (50MB)
 app.use(express.json({ limit: '50mb' }));
@@ -106,6 +66,18 @@ app.use('/api/contracts', contractRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/reports', reportRoutes);
 
+// 404 handler - يجب أن يكون بعد جميع routes
+app.use((req, res) => {
+  res.status(404).json({
+    status: false,
+    message: 'Request not found',
+    url: req.originalUrl,
+    method: req.method,
+    data: {}
+  });
+});
+
+// Error handler - يجب أن يكون بعد 404 handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ 
@@ -118,5 +90,6 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`API: http://localhost:${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/api/health`);
 });
 
