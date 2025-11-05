@@ -15,18 +15,27 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
+    console.log(`📥 [Users API] GET /users/${req.params.id}`);
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
+      console.error(`❌ [Users API] User not found: ${req.params.id}`);
       return res.status(404).json({ error: 'User not found' });
     }
-    res.json(user);
+    
+    // Ensure both id and _id are in response
+    const userData = user.toObject();
+    userData.id = userData._id;
+    console.log(`✅ [Users API] User found: ${userData.name} (${userData.email})`);
+    res.json(userData);
   } catch (error) {
+    console.error(`❌ [Users API] Error fetching user:`, error);
     res.status(500).json({ error: 'Failed to fetch user', message: error.message });
   }
 });
 
 router.put('/:id', async (req, res) => {
   try {
+    console.log(`📥 [Users API] PUT /users/${req.params.id}`);
     const { password, ...updateData } = req.body;
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -35,10 +44,17 @@ router.put('/:id', async (req, res) => {
     ).select('-password');
     
     if (!user) {
+      console.error(`❌ [Users API] User not found for update: ${req.params.id}`);
       return res.status(404).json({ error: 'User not found' });
     }
-    res.json(user);
+    
+    // Ensure both id and _id are in response
+    const userData = user.toObject();
+    userData.id = userData._id;
+    console.log(`✅ [Users API] User updated: ${userData.name} (${userData.email})`);
+    res.json(userData);
   } catch (error) {
+    console.error(`❌ [Users API] Error updating user:`, error);
     res.status(400).json({ error: 'Failed to update user', message: error.message });
   }
 });
@@ -56,6 +72,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 

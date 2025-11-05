@@ -31,14 +31,21 @@ export default function ContractorProfile() {
       setIsLoading(true);
       try {
         const user = getUser();
+        console.log('🔍 [Profile] Current user from localStorage:', user);
+        
         if (!user || (!user.id && !user._id)) {
+          console.error('❌ [Profile] No user ID found:', user);
           notifications.error('خطأ', 'يرجى تسجيل الدخول أولاً');
           setIsLoading(false);
           return;
         }
 
         const userId = user.id || user._id;
+        console.log('📤 [Profile] Fetching user data for ID:', userId);
+        
         const userData = await usersAPI.getById(userId);
+        console.log('✅ [Profile] User data received:', userData);
+        
         const profileData = {
           name: userData.name || '',
           companyName: userData.companyName || userData.company || '',
@@ -49,11 +56,18 @@ export default function ContractorProfile() {
           description: userData.description || userData.bio || ''
         };
         
+        console.log('📝 [Profile] Profile data prepared:', profileData);
         setForm(profileData);
         setOriginalForm(profileData);
       } catch (err) {
-        console.error('Error loading profile:', err);
-        notifications.error('خطأ', 'فشل تحميل بيانات الملف الشخصي');
+        console.error('❌ [Profile] Error loading profile:', err);
+        console.error('❌ [Profile] Error details:', {
+          message: err.message,
+          stack: err.stack,
+          name: err.name
+        });
+        const errorMessage = err.message || 'فشل تحميل بيانات الملف الشخصي';
+        notifications.error('خطأ', errorMessage);
       } finally {
         setIsLoading(false);
       }

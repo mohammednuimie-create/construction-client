@@ -66,7 +66,10 @@ const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
   }
 
   try {
+    console.log(`📤 [API] ${method} ${endpoint}`, data ? 'with data' : '');
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    
+    console.log(`📥 [API] Response status: ${response.status} ${response.statusText}`);
     
     // Check if response is JSON
     const contentType = response.headers.get('content-type');
@@ -74,13 +77,16 @@ const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
     
     if (contentType && contentType.includes('application/json')) {
       responseData = await response.json();
+      console.log(`✅ [API] Response data:`, responseData);
     } else {
       const text = await response.text();
+      console.error(`❌ [API] Non-JSON response:`, text.substring(0, 200));
       throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}`);
     }
 
     if (!response.ok) {
       const errorMessage = responseData.message || responseData.error || `HTTP ${response.status}: ${response.statusText}`;
+      console.error(`❌ [API] Error response:`, errorMessage);
       throw new Error(errorMessage);
     }
     return responseData;
