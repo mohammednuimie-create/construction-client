@@ -28,13 +28,14 @@ export default function ClientProfile() {
       setIsLoading(true);
       try {
         const user = getUser();
-        if (!user || !user.id) {
+        if (!user || (!user.id && !user._id)) {
           notifications.error('خطأ', 'يرجى تسجيل الدخول أولاً');
           setIsLoading(false);
           return;
         }
 
-        const userData = await usersAPI.getById(user.id || user._id);
+        const userId = user.id || user._id;
+        const userData = await usersAPI.getById(userId);
         const profileData = {
           name: userData.name || '',
           email: userData.email || '',
@@ -74,7 +75,13 @@ export default function ClientProfile() {
         address: form.address
       };
 
-      await usersAPI.update(user.id || user._id, updateData);
+      const userId = user.id || user._id;
+      if (!userId) {
+        notifications.error('خطأ', 'معرف المستخدم غير موجود');
+        setIsSaving(false);
+        return;
+      }
+      await usersAPI.update(userId, updateData);
       
       // Update local storage
       const updatedUser = { ...user, ...updateData };

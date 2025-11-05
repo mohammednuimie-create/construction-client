@@ -79,7 +79,7 @@ export default function ContractorDashboard() {
         const user = getUser();
         const filters = {};
         if (user?.role === 'contractor') {
-          filters.contractor = user.id;
+          filters.contractor = user.id || user._id;
         }
         
         // جلب جميع البيانات
