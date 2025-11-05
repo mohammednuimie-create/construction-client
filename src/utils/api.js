@@ -47,6 +47,7 @@ const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
   const headers = {
     'Content-Type': 'application/json',
     'x-ngrok-skip-browser-warning': 'true', // Skip Ngrok warning page
+    'ngrok-skip-browser-warning': 'true', // Alternative header
   };
   
   if (auth) {
@@ -70,6 +71,7 @@ const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     
     console.log(`📥 [API] Response status: ${response.status} ${response.statusText}`);
+    console.log(`📥 [API] Content-Type: ${response.headers.get('content-type')}`);
     
     // Check if response is JSON
     const contentType = response.headers.get('content-type');
@@ -80,6 +82,13 @@ const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
       console.log(`✅ [API] Response data:`, responseData);
     } else {
       const text = await response.text();
+      
+      // Check if it's Ngrok warning page
+      if (text.includes('ngrok') && text.includes('<!DOCTYPE html>')) {
+        console.error(`❌ [API] Ngrok warning page detected. Trying to bypass...`);
+        throw new Error('Ngrok warning page detected. Please verify the tunnel is running and try refreshing the page.');
+      }
+      
       console.error(`❌ [API] Non-JSON response:`, text.substring(0, 200));
       throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}`);
     }

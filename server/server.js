@@ -48,9 +48,10 @@ app.use(cors(corsOptions));
 
 // Middleware للتعامل مع Ngrok headers
 app.use((req, res, next) => {
-  // Skip Ngrok browser warning
-  if (req.headers['x-ngrok-skip-browser-warning']) {
+  // Skip Ngrok browser warning - إضافة جميع headers المطلوبة
+  if (req.headers['x-ngrok-skip-browser-warning'] || req.headers['ngrok-skip-browser-warning']) {
     res.setHeader('x-ngrok-skip-browser-warning', 'true');
+    res.setHeader('ngrok-skip-browser-warning', 'true');
   }
   next();
 });
