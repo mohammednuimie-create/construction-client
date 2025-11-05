@@ -6,41 +6,43 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// CORS Configuration - يسمح بالوصول من أي مصدر في Production
+// CORS Configuration - يسمح بالوصول من أي مصدر
 const corsOptions = {
   origin: function (origin, callback) {
     // قائمة بالـ Origins المسموحة
     const allowedOrigins = [
       'http://localhost:3000',
       'http://localhost:3001',
-      'https://nuimie.netlify.app',
-      'https://*.netlify.app', // أي Netlify subdomain
-      'https://*.vercel.app', // أي Vercel subdomain
-      'https://*.render.com' // أي Render subdomain
+      'http://127.0.0.1:3000',
+      'https://nuimie.netlify.app'
     ];
     
-    // في Development، السماح فقط بـ localhost
-    if (process.env.NODE_ENV === 'development' || !origin) {
-      if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1')) {
-        return callback(null, true);
-      }
-    }
+    // السماح بجميع Netlify subdomains
+    const isNetlifyApp = origin && origin.includes('.netlify.app');
+    const isVercelApp = origin && origin.includes('.vercel.app');
+    const isRenderApp = origin && origin.includes('.render.com');
     
-    // في Production، السماح بالـ Origins المسموحة
-    if (!origin || allowedOrigins.some(allowed => {
-      if (allowed.includes('*')) {
-        const pattern = allowed.replace('*', '.*');
-        return new RegExp(pattern).test(origin);
-      }
-      return origin === allowed;
-    })) {
+    // السماح إذا كان:
+    // 1. لا يوجد origin (مثل Postman أو curl)
+    // 2. في قائمة المسموحة
+    // 3. Netlify subdomain
+    // 4. Vercel subdomain
+    // 5. Render subdomain
+    if (!origin || 
+        allowedOrigins.includes(origin) || 
+        isNetlifyApp || 
+        isVercelApp || 
+        isRenderApp) {
       callback(null, true);
     } else {
+      console.log('CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-ngrok-skip-browser-warning']
 };
 app.use(cors(corsOptions));
 
