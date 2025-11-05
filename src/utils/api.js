@@ -9,32 +9,11 @@ export const getToken = () => localStorage.getItem('jwtToken');
 export const removeToken = () => localStorage.removeItem('jwtToken');
 
 // User Management
-export const setUser = (user) => {
-  // Ensure _id is set if id exists
-  if (user && user.id && !user._id) {
-    user._id = user.id;
-  }
-  // Ensure id is set if _id exists
-  if (user && user._id && !user.id) {
-    user.id = user._id;
-  }
-  localStorage.setItem('user', JSON.stringify(user));
-};
+export const setUser = (user) => localStorage.setItem('user', JSON.stringify(user));
 export const getUser = () => {
   try {
     const user = localStorage.getItem('user');
-    if (!user) return null;
-    const parsedUser = JSON.parse(user);
-    // Ensure both id and _id are available
-    if (parsedUser) {
-      if (parsedUser.id && !parsedUser._id) {
-        parsedUser._id = parsedUser.id;
-      }
-      if (parsedUser._id && !parsedUser.id) {
-        parsedUser.id = parsedUser._id;
-      }
-    }
-    return parsedUser;
+    return user ? JSON.parse(user) : null;
   } catch (e) {
     console.error("Failed to parse user from localStorage", e);
     return null;
@@ -46,8 +25,6 @@ export const removeUser = () => localStorage.removeItem('user');
 const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
   const headers = {
     'Content-Type': 'application/json',
-    'x-ngrok-skip-browser-warning': 'true', // Skip Ngrok warning page
-    'ngrok-skip-browser-warning': 'true', // Alternative header
   };
   
   if (auth) {
@@ -67,59 +44,16 @@ const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
   }
 
   try {
-    console.log(`📤 [API] ${method} ${endpoint}`, data ? 'with data' : '');
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    
-    console.log(`📥 [API] Response status: ${response.status} ${response.statusText}`);
-    console.log(`📥 [API] Content-Type: ${response.headers.get('content-type')}`);
-    
-    // Check if response is JSON
-    const contentType = response.headers.get('content-type');
-    let responseData;
-    
-    if (contentType && contentType.includes('application/json')) {
-      responseData = await response.json();
-      console.log(`✅ [API] Response data:`, responseData);
-    } else {
-      const text = await response.text();
-      
-      // Check if it's Ngrok warning page
-      if (text.includes('ngrok') && text.includes('<!DOCTYPE html>')) {
-        console.error(`❌ [API] Ngrok warning page detected. Trying to bypass...`);
-        throw new Error('Ngrok warning page detected. Please verify the tunnel is running and try refreshing the page.');
-      }
-      
-      console.error(`❌ [API] Non-JSON response:`, text.substring(0, 200));
-      throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}`);
-    }
+    const responseData = await response.json();
 
     if (!response.ok) {
-      const errorMessage = responseData.message || responseData.error || `HTTP ${response.status}: ${response.statusText}`;
-      console.error(`❌ [API] Error response:`, errorMessage);
-      throw new Error(errorMessage);
+      throw new Error(responseData.message || responseData.error || 'Something went wrong');
     }
     return responseData;
   } catch (error) {
     console.error(`API Error (${method} ${endpoint}):`, error);
-    
-    // Handle network errors (fetch fails, no response)
-    if (!error.response && (error.message.includes('fetch') || 
-        error.message.includes('NetworkError') || 
-        error.message.includes('Failed to fetch') ||
-        error.message.includes('Network request failed') ||
-        error.name === 'TypeError')) {
-      throw new Error('فشل الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت أو أن الخادم يعمل.');
-    }
-    
-    // Handle CORS errors
-    if (error.message.includes('CORS') || 
-        error.message.includes('Cross-Origin') ||
-        error.message.includes('Not allowed by CORS')) {
-      throw new Error('خطأ في الاتصال. يرجى المحاولة مرة أخرى أو تحديث الصفحة.');
-    }
-    
-    // If error already has a message, use it; otherwise create a generic one
-    throw error.message ? error : new Error('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
+    throw error;
   }
 };
 
