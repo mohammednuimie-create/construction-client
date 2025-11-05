@@ -1,19 +1,25 @@
-# Render.com Configuration
-# ضع هذا الملف في root directory إذا كان Backend في مجلد server
+# Render.com Configuration File
+# ضع هذا الملف في root directory
+# Render سيستخدمه تلقائياً عند ربط Repository
 
 services:
   - type: web
     name: construction-backend
     env: node
     plan: free
-    buildCommand: cd server && npm install
-    startCommand: cd server && npm start
+    region: oregon
+    branch: main
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+      # Note: MONGODB_URI and JWT_SECRET يجب إضافتها يدوياً في Render Dashboard
+      # لأنها معلومات حساسة
       - key: MONGODB_URI
-        sync: false  # ستحتاج لإضافته يدوياً في Render Dashboard
+        sync: false
       - key: JWT_SECRET
-        sync: false  # ستحتاج لإضافته يدوياً في Render Dashboard
+        sync: false
