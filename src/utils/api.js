@@ -9,11 +9,32 @@ export const getToken = () => localStorage.getItem('jwtToken');
 export const removeToken = () => localStorage.removeItem('jwtToken');
 
 // User Management
-export const setUser = (user) => localStorage.setItem('user', JSON.stringify(user));
+export const setUser = (user) => {
+  // Ensure _id is set if id exists
+  if (user && user.id && !user._id) {
+    user._id = user.id;
+  }
+  // Ensure id is set if _id exists
+  if (user && user._id && !user.id) {
+    user.id = user._id;
+  }
+  localStorage.setItem('user', JSON.stringify(user));
+};
 export const getUser = () => {
   try {
     const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    if (!user) return null;
+    const parsedUser = JSON.parse(user);
+    // Ensure both id and _id are available
+    if (parsedUser) {
+      if (parsedUser.id && !parsedUser._id) {
+        parsedUser._id = parsedUser.id;
+      }
+      if (parsedUser._id && !parsedUser.id) {
+        parsedUser.id = parsedUser._id;
+      }
+    }
+    return parsedUser;
   } catch (e) {
     console.error("Failed to parse user from localStorage", e);
     return null;
@@ -25,6 +46,7 @@ export const removeUser = () => localStorage.removeItem('user');
 const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
   const headers = {
     'Content-Type': 'application/json',
+    'x-ngrok-skip-browser-warning': 'true', // Skip Ngrok warning page
   };
   
   if (auth) {
@@ -45,14 +67,36 @@ const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    const responseData = await response.json();
+    
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    let responseData;
+    
+    if (contentType && contentType.includes('application/json')) {
+      responseData = await response.json();
+    } else {
+      const text = await response.text();
+      throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}`);
+    }
 
     if (!response.ok) {
-      throw new Error(responseData.message || responseData.error || 'Something went wrong');
+      const errorMessage = responseData.message || responseData.error || `HTTP ${response.status}: ${response.statusText}`;
+      throw new Error(errorMessage);
     }
     return responseData;
   } catch (error) {
     console.error(`API Error (${method} ${endpoint}):`, error);
+    
+    // Handle network errors
+    if (error.message.includes('fetch') || error.message.includes('NetworkError')) {
+      throw new Error('فشل الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.');
+    }
+    
+    // Handle CORS errors
+    if (error.message.includes('CORS') || error.message.includes('Cross-Origin')) {
+      throw new Error('خطأ في الاتصال. يرجى المحاولة مرة أخرى.');
+    }
+    
     throw error;
   }
 };

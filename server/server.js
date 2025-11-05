@@ -46,6 +46,15 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+// Middleware للتعامل مع Ngrok headers
+app.use((req, res, next) => {
+  // Skip Ngrok browser warning
+  if (req.headers['x-ngrok-skip-browser-warning']) {
+    res.setHeader('x-ngrok-skip-browser-warning', 'true');
+  }
+  next();
+});
+
 // زيادة حد حجم الطلب لدعم الصور الكبيرة (50MB)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
