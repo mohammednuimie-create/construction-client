@@ -1,0 +1,58 @@
+═══════════════════════════════════════════════════════════
+   📋 قيم Render - انسخ والصق مباشرة
+═══════════════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BASIC SETTINGS (الإعدادات الأساسية)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Name:
+construction-api
+
+Language:
+Node
+
+Branch:
+main
+
+Region:
+Oregon (US West)
+(أو أي منطقة تريدها)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ADVANCED SETTINGS (الإعدادات المتقدمة)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Root Directory:
+server
+
+Build Command:
+npm install
+
+Start Command:
+node server.js
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ENVIRONMENT VARIABLES (المتغيرات البيئية)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+متغير 1:
+Key:   MONGODB_URI
+Value: [الصق Connection String من MongoDB Atlas هنا]
+       مثال: mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/construction-management?retryWrites=true&w=majority
+
+متغير 2:
+Key:   NODE_ENV
+Value: production
+
+متغير 3 (اختياري):
+Key:   PORT
+Value: 10000
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ ملاحظة: MONGODB_URI يجب أن تضيفه يدوياً من MongoDB Atlas
+
+═══════════════════════════════════════════════════════════
+
+
