@@ -87,17 +87,24 @@ const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
   } catch (error) {
     console.error(`API Error (${method} ${endpoint}):`, error);
     
-    // Handle network errors
-    if (error.message.includes('fetch') || error.message.includes('NetworkError')) {
-      throw new Error('فشل الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.');
+    // Handle network errors (fetch fails, no response)
+    if (!error.response && (error.message.includes('fetch') || 
+        error.message.includes('NetworkError') || 
+        error.message.includes('Failed to fetch') ||
+        error.message.includes('Network request failed') ||
+        error.name === 'TypeError')) {
+      throw new Error('فشل الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت أو أن الخادم يعمل.');
     }
     
     // Handle CORS errors
-    if (error.message.includes('CORS') || error.message.includes('Cross-Origin')) {
-      throw new Error('خطأ في الاتصال. يرجى المحاولة مرة أخرى.');
+    if (error.message.includes('CORS') || 
+        error.message.includes('Cross-Origin') ||
+        error.message.includes('Not allowed by CORS')) {
+      throw new Error('خطأ في الاتصال. يرجى المحاولة مرة أخرى أو تحديث الصفحة.');
     }
     
-    throw error;
+    // If error already has a message, use it; otherwise create a generic one
+    throw error.message ? error : new Error('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
   }
 };
 
