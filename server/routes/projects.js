@@ -23,18 +23,34 @@ router.get('/', async (req, res) => {
     // عزل البيانات: المستخدم يرى فقط بياناته
     if (req.userRole === 'contractor') {
       // المقاول يرى فقط مشاريعه
-      // تحويل userId إلى ObjectId للتأكد من المطابقة
-      query.contractor = mongoose.Types.ObjectId.isValid(req.userId) 
-        ? new mongoose.Types.ObjectId(req.userId) 
-        : req.userId;
-      console.log(`🔒 [Projects GET] Filtering by contractor: ${req.userId} (type: ${typeof req.userId})`);
+      // البحث عن String و ObjectId معاً للتأكد من المطابقة
+      const userIdStr = req.userId.toString();
+      if (mongoose.Types.ObjectId.isValid(req.userId)) {
+        const userIdObj = new mongoose.Types.ObjectId(req.userId);
+        query.$or = [
+          { contractor: userIdStr },
+          { contractor: userIdObj }
+        ];
+        console.log(`🔒 [Projects GET] Filtering by contractor: ${userIdStr} (as String and ObjectId)`);
+      } else {
+        query.contractor = userIdStr;
+        console.log(`🔒 [Projects GET] Filtering by contractor: ${userIdStr} (as String only)`);
+      }
     } else if (req.userRole === 'client') {
       // العميل يرى فقط مشاريعه
-      // تحويل userId إلى ObjectId للتأكد من المطابقة
-      query.client = mongoose.Types.ObjectId.isValid(req.userId) 
-        ? new mongoose.Types.ObjectId(req.userId) 
-        : req.userId;
-      console.log(`🔒 [Projects GET] Filtering by client: ${req.userId} (type: ${typeof req.userId})`);
+      // البحث عن String و ObjectId معاً للتأكد من المطابقة
+      const userIdStr = req.userId.toString();
+      if (mongoose.Types.ObjectId.isValid(req.userId)) {
+        const userIdObj = new mongoose.Types.ObjectId(req.userId);
+        query.$or = [
+          { client: userIdStr },
+          { client: userIdObj }
+        ];
+        console.log(`🔒 [Projects GET] Filtering by client: ${userIdStr} (as String and ObjectId)`);
+      } else {
+        query.client = userIdStr;
+        console.log(`🔒 [Projects GET] Filtering by client: ${userIdStr} (as String only)`);
+      }
     } else {
       // إذا كان الدور غير معروف، لا نرجع أي بيانات
       console.log(`⚠️ [Projects GET] Unknown role: ${req.userRole} - returning empty array`);
