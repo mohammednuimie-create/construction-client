@@ -2,15 +2,16 @@ import React, { useState, useEffect } from "react";
 import { authAPI, setToken, setUser } from "./utils/api";
 
 const BRAND = {
-  primary: '#0f172a',
-  accent: '#06b6d4',
-  secondary: '#3b82f6',
-  gradient: 'linear-gradient(135deg, #0f172a 0%, #1e40af 50%, #06b6d4 100%)',
-  gradientLight: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
-  gradientContractor: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
-  gradientClient: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
-  light: '#f1f5f9',
-  dark: '#0a0f1c',
+  primary: '#1e3a5f',
+  accent: '#2a9d8f',
+  secondary: '#264653',
+  gradient: 'linear-gradient(135deg, #1e3a5f 0%, #2a9d8f 50%, #264653 100%)',
+  gradientLight: 'linear-gradient(135deg, #1e3a5f 0%, #2a9d8f 100%)',
+  gradientContractor: 'linear-gradient(135deg, #1e3a5f 0%, #2a9d8f 100%)',
+  gradientClient: 'linear-gradient(135deg, #2a9d8f 0%, #1e3a5f 100%)',
+  light: '#f8fafc',
+  dark: '#0f172a',
+  muted: '#64748b',
 };
 
 const icons = {
@@ -190,7 +191,45 @@ export default function RoleLogin({ onLogin, onGuest, initialStep = 1, loading =
   }, [step]);
 
   return (
-    <div style={{ animation: "fadeIn 0.6s", fontFamily: 'Cairo, system-ui, Arial' }}>
+    <div style={{ 
+      animation: "fadeIn 0.6s", 
+      fontFamily: 'Cairo, system-ui, Arial',
+      minHeight: '100vh',
+      background: BRAND.gradient,
+      position: 'relative',
+      overflow: 'hidden',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '40px 20px'
+    }}>
+      {/* Background Effects */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(circle at 20% 50%, rgba(42, 157, 143, 0.2) 0%, transparent 50%)',
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(circle at 80% 80%, rgba(30, 58, 95, 0.15) 0%, transparent 50%)',
+        pointerEvents: 'none'
+      }} />
+      
+      {/* Main Content Container */}
+      <div style={{
+        position: 'relative',
+        zIndex: 1,
+        width: '100%',
+        maxWidth: 500,
+        background: 'rgba(255, 255, 255, 0.98)',
+        borderRadius: 32,
+        padding: '48px 40px',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.3)'
+      }}>
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(20px); }
@@ -249,7 +288,7 @@ export default function RoleLogin({ onLogin, onGuest, initialStep = 1, loading =
         }
         .input-field:focus {
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(6, 182, 212, 0.2) !important;
+          box-shadow: 0 6px 20px rgba(42, 157, 143, 0.2) !important;
         }
         .submit-btn {
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -274,7 +313,7 @@ export default function RoleLogin({ onLogin, onGuest, initialStep = 1, loading =
         }
         .submit-btn:hover {
           transform: translateY(-3px);
-          box-shadow: 0 12px 35px rgba(6, 182, 212, 0.5) !important;
+          box-shadow: 0 12px 35px rgba(42, 157, 143, 0.5) !important;
         }
         .card-float {
           animation: float 6s ease-in-out infinite;
@@ -294,7 +333,7 @@ export default function RoleLogin({ onLogin, onGuest, initialStep = 1, loading =
               justifyContent: 'center',
               fontSize: 40,
               margin: '0 auto 24px',
-              boxShadow: '0 10px 40px rgba(6, 182, 212, 0.3)'
+              boxShadow: '0 10px 40px rgba(42, 157, 143, 0.3)'
             }}>
               🏗️
             </div>
@@ -785,7 +824,7 @@ export default function RoleLogin({ onLogin, onGuest, initialStep = 1, loading =
               cursor: (loading || isLoading) ? "not-allowed" : "pointer",
               marginBottom: 16,
               fontWeight: 700,
-              boxShadow: '0 8px 30px rgba(6, 182, 212, 0.4)',
+                  boxShadow: '0 8px 30px rgba(42, 157, 143, 0.4)',
               opacity: (loading || isLoading) ? 0.7 : 1,
             }}
           >
@@ -883,6 +922,7 @@ export default function RoleLogin({ onLogin, onGuest, initialStep = 1, loading =
           </div>
         </form>
       )}
+      </div>
       <style>{`
        @keyframes fadeIn {from{opacity: 0; transform: translateY(80px);} to {opacity: 1; transform: none;}}
       `}</style>

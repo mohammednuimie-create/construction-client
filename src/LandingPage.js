@@ -107,18 +107,21 @@ export default function LandingPage() {
 
   const projects = [
     {
+      id: 1,
       title: 'برج إداري متطور',
       category: 'مباني إدارية',
       image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1400&h=900&fit=crop&q=85',
       stats: { area: '5000 م²', floors: '20 طابق', duration: '18 شهر' }
     },
     {
+      id: 2,
       title: 'مجمع سكني فاخر',
       category: 'مباني سكنية',
       image: 'https://images.unsplash.com/photo-1600585154526-990dac4d53ef?w=1400&h=900&fit=crop&q=85',
       stats: { area: '8000 م²', floors: '15 طابق', duration: '24 شهر' }
     },
     {
+      id: 3,
       title: 'مركز تجاري',
       category: 'مراكز تجارية',
       image: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1400&h=900&fit=crop&q=85',
@@ -885,10 +888,38 @@ export default function LandingPage() {
               <p style={{
                 fontSize: 16,
                 color: BRAND.muted,
-                lineHeight: 1.7
+                lineHeight: 1.7,
+                marginBottom: 20
               }}>
                 {item.desc}
               </p>
+              {item.step === 1 && (
+                <button
+                  onClick={() => navigate('/login')}
+                  style={{
+                    width: '100%',
+                    padding: '12px 24px',
+                    background: BRAND.gradientLight,
+                    color: '#fff',
+                    border: 0,
+                    borderRadius: 12,
+                    fontSize: 15,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(42, 157, 143, 0.4)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  ابدأ الآن →
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -934,13 +965,15 @@ export default function LandingPage() {
           {projects.map((project, index) => (
             <div
               key={index}
+              onClick={() => navigate('/showcase')}
               style={{
                 background: 'rgba(255,255,255,0.05)',
                 borderRadius: 24,
                 overflow: 'hidden',
                 border: '1px solid rgba(255,255,255,0.1)',
                 transition: 'all 0.4s ease',
-                backdropFilter: 'blur(10px)'
+                backdropFilter: 'blur(10px)',
+                cursor: 'pointer'
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.transform = 'translateY(-10px)';
@@ -998,7 +1031,8 @@ export default function LandingPage() {
                   gridTemplateColumns: 'repeat(3, 1fr)',
                   gap: 16,
                   paddingTop: 20,
-                  borderTop: '1px solid rgba(255,255,255,0.1)'
+                  borderTop: '1px solid rgba(255,255,255,0.1)',
+                  marginBottom: 20
                 }}>
                   {Object.entries(project.stats).map(([key, value]) => (
                     <div key={key}>
@@ -1019,6 +1053,35 @@ export default function LandingPage() {
                     </div>
                   ))}
                 </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/showcase');
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '12px 24px',
+                    background: BRAND.gradientLight,
+                    color: '#fff',
+                    border: 0,
+                    borderRadius: 12,
+                    fontSize: 16,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    marginTop: 8
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(42, 157, 143, 0.4)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  عرض التفاصيل →
+                </button>
               </div>
             </div>
           ))}
