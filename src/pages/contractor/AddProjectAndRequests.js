@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { projectsAPI, requestsAPI, usersAPI, getUser } from "../../utils/api";
+import React, { useState, useEffect, useRef } from "react";
+import { projectsAPI, requestsAPI, usersAPI, materialsAPI, getUser } from "../../utils/api";
 import { useNotifications } from "../../components/NotificationSystem";
 
 const BRAND = {
@@ -23,12 +23,30 @@ export default function AddProjectAndRequests(){
     expectedEndDate: '',
     notes: ''
   });
-  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+  const [activeTab, setActiveTab] = useState(1); // التبويبة النشطة
   const [clientRequests, setClientRequests] = useState([]);
   const [clients, setClients] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Materials state
+  const [materials, setMaterials] = useState([]);
+  const [availableMaterials, setAvailableMaterials] = useState([]);
+  const [newMaterial, setNewMaterial] = useState({ name: '', quantity: '', unit: 'وحدة', cost: '' });
+  
+  // Engineers state
+  const [engineers, setEngineers] = useState([]);
+  const [newEngineer, setNewEngineer] = useState({ name: '', specialty: 'مدني', salary: '', phone: '', email: '', notes: '' });
+  
+  // Crews state
+  const [crews, setCrews] = useState([]);
+  const [newCrew, setNewCrew] = useState('');
+  
+  // Images state
+  const [images, setImages] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,6 +73,14 @@ export default function AddProjectAndRequests(){
         
         setClientRequests(filteredRequests);
         setClients(clientsData || []);
+        
+        // جلب المواد المتاحة
+        try {
+          const materialsData = await materialsAPI.getAll();
+          setAvailableMaterials(materialsData || []);
+        } catch (err) {
+          console.error('Error fetching materials:', err);
+        }
       } catch (err) {
         setError(err.message || 'حدث خطأ أثناء جلب البيانات');
         console.error('Error fetching data:', err);
@@ -65,10 +91,151 @@ export default function AddProjectAndRequests(){
     fetchData();
   }, []);
 
-  // Debug: Log advanced mode changes
-  useEffect(() => {
-    console.log('🔍 isAdvancedMode changed:', isAdvancedMode);
-  }, [isAdvancedMode]);
+  // دالة ضغط الصور
+  const compressImage = (file, maxWidth = 1920, maxHeight = 1080, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+              if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+              }
+            } else {
+              if (height > maxHeight) {
+                width = Math.round((width * maxHeight) / height);
+                height = maxHeight;
+              }
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressedBase64);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+  
+  // إضافة مادة
+  const handleAddMaterial = (e) => {
+    e.preventDefault();
+    if (!newMaterial.name || !newMaterial.quantity || !newMaterial.cost) {
+      notifications.warning('تحذير', 'يرجى ملء جميع الحقول المطلوبة');
+      return;
+    }
+    const material = {
+      id: Date.now(),
+      name: newMaterial.name,
+      quantity: parseFloat(newMaterial.quantity) || 0,
+      unit: newMaterial.unit || 'وحدة',
+      cost: parseFloat(newMaterial.cost) || 0
+    };
+    setMaterials([...materials, material]);
+    setNewMaterial({ name: '', quantity: '', unit: 'وحدة', cost: '' });
+    notifications.success('نجح', `تم إضافة المادة ${material.name}`);
+  };
+  
+  const handleRemoveMaterial = (id) => {
+    setMaterials(materials.filter(m => m.id !== id));
+  };
+  
+  // إضافة مهندس
+  const handleAddEngineer = (e) => {
+    e.preventDefault();
+    if (!newEngineer.name || !newEngineer.salary) {
+      notifications.warning('تحذير', 'يرجى ملء اسم المهندس والراتب');
+      return;
+    }
+    const engineer = {
+      id: Date.now(),
+      name: newEngineer.name,
+      specialty: newEngineer.specialty,
+      salary: parseFloat(newEngineer.salary) || 0,
+      phone: newEngineer.phone || '',
+      email: newEngineer.email || '',
+      notes: newEngineer.notes || ''
+    };
+    setEngineers([...engineers, engineer]);
+    setNewEngineer({ name: '', specialty: 'مدني', salary: '', phone: '', email: '', notes: '' });
+    notifications.success('نجح', `تم إضافة المهندس ${engineer.name}`);
+  };
+  
+  const handleRemoveEngineer = (id) => {
+    setEngineers(engineers.filter(e => e.id !== id));
+  };
+  
+  // إضافة فريق عمل
+  const handleAddCrew = (e) => {
+    e.preventDefault();
+    if (!newCrew.trim()) {
+      notifications.warning('تحذير', 'يرجى إدخال اسم الفريق');
+      return;
+    }
+    setCrews([...crews, newCrew.trim()]);
+    setNewCrew('');
+    notifications.success('نجح', `تم إضافة فريق ${newCrew.trim()}`);
+  };
+  
+  const handleRemoveCrew = (index) => {
+    setCrews(crews.filter((_, i) => i !== index));
+  };
+  
+  // رفع الصور
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    
+    setUploading(true);
+    try {
+      const newImageUrls = [];
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) continue;
+        try {
+          const compressedBase64 = await compressImage(file);
+          newImageUrls.push(compressedBase64);
+        } catch (err) {
+          console.error(`خطأ في ضغط الصورة ${file.name}:`, err);
+          const reader = new FileReader();
+          const promise = new Promise((resolve, reject) => {
+            reader.onload = (event) => {
+              newImageUrls.push(event.target.result);
+              resolve();
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          await promise;
+        }
+      }
+      setImages([...images, ...newImageUrls]);
+      notifications.success('نجح', `تم رفع ${newImageUrls.length} صورة`);
+    } catch (err) {
+      notifications.error('خطأ', 'حدث خطأ أثناء رفع الصور');
+      console.error('Error uploading images:', err);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+  
+  const handleRemoveImage = (index) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
 
   const handleProjectInput = (e) => {
     setProjectForm({ ...projectForm, [e.target.name]: e.target.value });
@@ -85,26 +252,40 @@ export default function AddProjectAndRequests(){
       const user = getUser();
       const projectData = {
         name: projectForm.name,
-        client: projectForm.client || undefined, // ObjectId للعميل
+        client: projectForm.client || undefined,
         budget: parseFloat(projectForm.budget),
         description: projectForm.description || '',
-        location: isAdvancedMode ? (projectForm.location || '') : '',
-        startDate: isAdvancedMode && projectForm.startDate ? new Date(projectForm.startDate) : undefined,
-        expectedEndDate: isAdvancedMode && projectForm.expectedEndDate ? new Date(projectForm.expectedEndDate) : undefined,
-        notes: isAdvancedMode ? (projectForm.notes || '') : '',
+        location: projectForm.location || '',
+        startDate: projectForm.startDate ? new Date(projectForm.startDate) : undefined,
+        expectedEndDate: projectForm.expectedEndDate ? new Date(projectForm.expectedEndDate) : undefined,
+        notes: projectForm.notes || '',
         status: 'pending',
         contractor: user?.id || user?._id,
         createdBy: user?.id || user?._id,
-        engineers: [],
-        crews: [],
-        materials: [],
-        images: []
+        engineers: engineers.map(e => ({
+          name: e.name,
+          specialty: e.specialty,
+          salary: e.salary,
+          phone: e.phone,
+          email: e.email,
+          notes: e.notes
+        })),
+        crews: crews,
+        materials: materials.map(m => ({
+          name: m.name,
+          quantity: m.quantity,
+          unit: m.unit,
+          cost: m.cost
+        })),
+        images: images
       };
       
       console.log('📤 إرسال بيانات المشروع:', projectData);
       const result = await projectsAPI.create(projectData);
       console.log('✅ تم حفظ المشروع:', result);
       notifications.success('نجح', `تم حفظ المشروع "${projectForm.name}" بنجاح`);
+      
+      // إعادة تعيين جميع الحقول
       setProjectForm({ 
         name: '', 
         client: '',
@@ -115,6 +296,11 @@ export default function AddProjectAndRequests(){
         expectedEndDate: '',
         notes: ''
       });
+      setMaterials([]);
+      setEngineers([]);
+      setCrews([]);
+      setImages([]);
+      setActiveTab(1);
     } catch (err) {
       notifications.error('خطأ', err.message || 'حدث خطأ أثناء حفظ المشروع');
       console.error('Error creating project:', err);
@@ -214,42 +400,6 @@ export default function AddProjectAndRequests(){
             إضافة مشروع جديد أو إدارة طلبات العملاء المعلقة
           </p>
         </div>
-        <button
-          onClick={() => {
-            console.log('🔄 تبديل النموذج:', !isAdvancedMode);
-            setIsAdvancedMode(!isAdvancedMode);
-          }}
-          style={{
-            background: isAdvancedMode ? BRAND.gradient : BRAND.light,
-            color: isAdvancedMode ? '#fff' : BRAND.dark,
-            border: 0,
-            borderRadius: 12,
-            padding: '12px 20px',
-            fontWeight: 700,
-            fontSize: 14,
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            boxShadow: isAdvancedMode ? '0 4px 12px rgba(30,58,95,0.3)' : 'none'
-          }}
-          onMouseOver={e => {
-            if (!isAdvancedMode) {
-              e.currentTarget.style.background = '#e2e8f0';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }
-          }}
-          onMouseOut={e => {
-            if (!isAdvancedMode) {
-              e.currentTarget.style.background = BRAND.light;
-              e.currentTarget.style.transform = 'none';
-            }
-          }}
-        >
-          <span>⚙️</span>
-          <span>{isAdvancedMode ? 'نموذج بسيط' : 'نموذج متقدم'}</span>
-        </button>
       </div>
 
       {/* Two Column Layout */}
@@ -296,197 +446,95 @@ export default function AddProjectAndRequests(){
             </h3>
           </div>
           
-          <form onSubmit={saveProject} style={{ display: 'grid', gap: 16 }}>
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: 8,
-                color: BRAND.dark,
-                fontWeight: 600,
-                fontSize: 14
-              }}>
-                اسم المشروع *
-              </label>
-              <input
-                name="name"
-                value={projectForm.name}
-                onChange={handleProjectInput}
-                placeholder="أدخل اسم المشروع"
-                required
+          {/* Tabs */}
+          <div style={{
+            display: 'flex',
+            gap: 8,
+            marginBottom: 24,
+            borderBottom: '2px solid ' + BRAND.light,
+            overflowX: 'auto'
+          }}>
+            {[
+              { id: 1, label: 'معلومات أساسية', icon: '📋' },
+              { id: 2, label: 'المواد اللازمة', icon: '🧱' },
+              { id: 3, label: 'المهندسين والمتعاقدين', icon: '👷' },
+              { id: 4, label: 'صور المشروع', icon: '📷' },
+              { id: 5, label: 'معلومات إضافية', icon: '⚙️' }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
                 style={{
-                  width: '100%',
-                  padding: 14,
-                  border: '2px solid #e5e7eb',
-                  borderRadius: 12,
-                  fontSize: 15,
-                  outline: 'none',
+                  padding: '12px 20px',
+                  border: 'none',
+                  background: 'transparent',
+                  color: activeTab === tab.id ? BRAND.primary : BRAND.muted,
+                  fontWeight: activeTab === tab.id ? 700 : 500,
+                  fontSize: 14,
+                  cursor: 'pointer',
+                  borderBottom: activeTab === tab.id ? `3px solid ${BRAND.accent}` : '3px solid transparent',
                   transition: 'all 0.3s ease',
-                  background: BRAND.light
+                  whiteSpace: 'nowrap',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6
                 }}
-                onFocus={e => {
-                  e.target.style.borderColor = BRAND.accent;
-                  e.target.style.background = '#fff';
+                onMouseOver={e => {
+                  if (activeTab !== tab.id) {
+                    e.currentTarget.style.color = BRAND.primary;
+                  }
                 }}
-                onBlur={e => {
-                  e.target.style.borderColor = '#e5e7eb';
-                  e.target.style.background = BRAND.light;
-                }}
-              />
-            </div>
-            
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: 8,
-                color: BRAND.dark,
-                fontWeight: 600,
-                fontSize: 14
-              }}>
-                العميل *
-              </label>
-              <select
-                name="client"
-                value={projectForm.client}
-                onChange={handleProjectInput}
-                required
-                style={{
-                  width: '100%',
-                  padding: 14,
-                  border: '2px solid #e5e7eb',
-                  borderRadius: 12,
-                  fontSize: 15,
-                  outline: 'none',
-                  transition: 'all 0.3s ease',
-                  background: BRAND.light
-                }}
-                onFocus={e => {
-                  e.target.style.borderColor = BRAND.accent;
-                  e.target.style.background = '#fff';
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = '#e5e7eb';
-                  e.target.style.background = BRAND.light;
+                onMouseOut={e => {
+                  if (activeTab !== tab.id) {
+                    e.currentTarget.style.color = BRAND.muted;
+                  }
                 }}
               >
-                <option value="">اختر العميل</option>
-                {clients.length === 0 ? (
-                  <option value="" disabled>لا توجد عملاء - أضف عميل أولاً من صفحة العملاء والمتعاقدين</option>
-                ) : (
-                  clients.map(c => (
-                    <option key={c._id || c.id} value={c._id || c.id}>
-                      {c.name} {c.email ? `(${c.email})` : ''}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
-            
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: 8,
-                color: BRAND.dark,
-                fontWeight: 600,
-                fontSize: 14
-              }}>
-                الميزانية ($) *
-              </label>
-              <input
-                name="budget"
-                type="number"
-                value={projectForm.budget}
-                onChange={handleProjectInput}
-                placeholder="0"
-                min="0"
-                step="0.01"
-                required
-                style={{
-                  width: '100%',
-                  padding: 14,
-                  border: '2px solid #e5e7eb',
-                  borderRadius: 12,
-                  fontSize: 15,
-                  outline: 'none',
-                  transition: 'all 0.3s ease',
-                  background: BRAND.light
-                }}
-                onFocus={e => {
-                  e.target.style.borderColor = BRAND.accent;
-                  e.target.style.background = '#fff';
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = '#e5e7eb';
-                  e.target.style.background = BRAND.light;
-                }}
-              />
-            </div>
-            
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: 8,
-                color: BRAND.dark,
-                fontWeight: 600,
-                fontSize: 14
-              }}>
-                الوصف
-              </label>
-              <textarea
-                name="description"
-                value={projectForm.description}
-                onChange={handleProjectInput}
-                placeholder="وصف مختصر عن المشروع"
-                rows={4}
-                style={{
-                  width: '100%',
-                  padding: 14,
-                  border: '2px solid #e5e7eb',
-                  borderRadius: 12,
-                  fontSize: 15,
-                  outline: 'none',
-                  transition: 'all 0.3s ease',
-                  background: BRAND.light,
-                  fontFamily: 'inherit',
-                  resize: 'vertical'
-                }}
-                onFocus={e => {
-                  e.target.style.borderColor = BRAND.accent;
-                  e.target.style.background = '#fff';
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = '#e5e7eb';
-                  e.target.style.background = BRAND.light;
-                }}
-              />
-            </div>
-
-            {/* Advanced Mode Fields */}
-            {isAdvancedMode ? (
-              <>
-                <div style={{
-                  padding: '16px',
-                  background: '#f0f9ff',
-                  borderRadius: 12,
-                  border: `2px solid ${BRAND.accent}`,
-                  marginBottom: 16
-                }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 8,
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </div>
+          
+          <form onSubmit={saveProject}>
+            {/* Tab 1: معلومات أساسية */}
+            {activeTab === 1 && (
+              <div style={{ display: 'grid', gap: 16 }}>
+                <div>
+                  <label style={{
+                    display: 'block',
                     marginBottom: 8,
-                    color: BRAND.primary,
-                    fontWeight: 700
+                    color: BRAND.dark,
+                    fontWeight: 600,
+                    fontSize: 14
                   }}>
-                    <span>⚙️</span>
-                    <span>النموذج المتقدم مفعّل</span>
-                  </div>
-                  <div style={{ 
-                    fontSize: 13, 
-                    color: BRAND.muted 
-                  }}>
-                    يمكنك إضافة معلومات إضافية عن المشروع
-                  </div>
+                    اسم المشروع *
+                  </label>
+                  <input
+                    name="name"
+                    value={projectForm.name}
+                    onChange={handleProjectInput}
+                    placeholder="أدخل اسم المشروع"
+                    required
+                    style={{
+                      width: '100%',
+                      padding: 14,
+                      border: '2px solid #e5e7eb',
+                      borderRadius: 12,
+                      fontSize: 15,
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      background: BRAND.light
+                    }}
+                    onFocus={e => {
+                      e.target.style.borderColor = BRAND.accent;
+                      e.target.style.background = '#fff';
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = '#e5e7eb';
+                      e.target.style.background = BRAND.light;
+                    }}
+                  />
                 </div>
                 
                 <div>
@@ -501,7 +549,6 @@ export default function AddProjectAndRequests(){
                   </label>
                   <input
                     name="location"
-                    type="text"
                     value={projectForm.location}
                     onChange={handleProjectInput}
                     placeholder="موقع المشروع"
@@ -525,7 +572,615 @@ export default function AddProjectAndRequests(){
                     }}
                   />
                 </div>
-
+                
+                <div>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: 8,
+                    color: BRAND.dark,
+                    fontWeight: 600,
+                    fontSize: 14
+                  }}>
+                    الميزانية البدائية ($) *
+                  </label>
+                  <input
+                    name="budget"
+                    type="number"
+                    value={projectForm.budget}
+                    onChange={handleProjectInput}
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                    required
+                    style={{
+                      width: '100%',
+                      padding: 14,
+                      border: '2px solid #e5e7eb',
+                      borderRadius: 12,
+                      fontSize: 15,
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      background: BRAND.light
+                    }}
+                    onFocus={e => {
+                      e.target.style.borderColor = BRAND.accent;
+                      e.target.style.background = '#fff';
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = '#e5e7eb';
+                      e.target.style.background = BRAND.light;
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: 8,
+                    color: BRAND.dark,
+                    fontWeight: 600,
+                    fontSize: 14
+                  }}>
+                    العميل *
+                  </label>
+                  <select
+                    name="client"
+                    value={projectForm.client}
+                    onChange={handleProjectInput}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: 14,
+                      border: '2px solid #e5e7eb',
+                      borderRadius: 12,
+                      fontSize: 15,
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      background: BRAND.light
+                    }}
+                    onFocus={e => {
+                      e.target.style.borderColor = BRAND.accent;
+                      e.target.style.background = '#fff';
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = '#e5e7eb';
+                      e.target.style.background = BRAND.light;
+                    }}
+                  >
+                    <option value="">اختر العميل</option>
+                    {clients.length === 0 ? (
+                      <option value="" disabled>لا توجد عملاء - أضف عميل أولاً من صفحة العملاء والمتعاقدين</option>
+                    ) : (
+                      clients.map(c => (
+                        <option key={c._id || c.id} value={c._id || c.id}>
+                          {c.name} {c.email ? `(${c.email})` : ''}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+              </div>
+            )}
+            
+            {/* Tab 2: المواد اللازمة */}
+            {activeTab === 2 && (
+              <div style={{ display: 'grid', gap: 16 }}>
+                <div style={{
+                  padding: 16,
+                  background: '#f0f9ff',
+                  borderRadius: 12,
+                  border: `2px solid ${BRAND.accent}`
+                }}>
+                  <h4 style={{ margin: '0 0 12px 0', color: BRAND.primary, fontSize: 16 }}>إضافة مادة جديدة</h4>
+                  <form onSubmit={handleAddMaterial} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: 12 }}>
+                    <input
+                      type="text"
+                      placeholder="اسم المادة"
+                      value={newMaterial.name}
+                      onChange={(e) => setNewMaterial({ ...newMaterial, name: e.target.value })}
+                      required
+                      style={{
+                        padding: 12,
+                        border: '2px solid #e5e7eb',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        outline: 'none'
+                      }}
+                    />
+                    <input
+                      type="number"
+                      placeholder="الكمية"
+                      value={newMaterial.quantity}
+                      onChange={(e) => setNewMaterial({ ...newMaterial, quantity: e.target.value })}
+                      min="0"
+                      step="0.01"
+                      required
+                      style={{
+                        padding: 12,
+                        border: '2px solid #e5e7eb',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        outline: 'none'
+                      }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="الوحدة"
+                      value={newMaterial.unit}
+                      onChange={(e) => setNewMaterial({ ...newMaterial, unit: e.target.value })}
+                      style={{
+                        padding: 12,
+                        border: '2px solid #e5e7eb',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        outline: 'none'
+                      }}
+                    />
+                    <input
+                      type="number"
+                      placeholder="التكلفة"
+                      value={newMaterial.cost}
+                      onChange={(e) => setNewMaterial({ ...newMaterial, cost: e.target.value })}
+                      min="0"
+                      step="0.01"
+                      required
+                      style={{
+                        padding: 12,
+                        border: '2px solid #e5e7eb',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        outline: 'none'
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      style={{
+                        padding: '12px 20px',
+                        background: BRAND.accent,
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 8,
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      إضافة
+                    </button>
+                  </form>
+                </div>
+                
+                {materials.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: BRAND.muted }}>
+                    <div style={{ fontSize: 48, marginBottom: 12 }}>🧱</div>
+                    <div style={{ fontSize: 16 }}>لا توجد مواد مضافة</div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gap: 12 }}>
+                    {materials.map(m => (
+                      <div
+                        key={m.id}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: 16,
+                          background: BRAND.light,
+                          borderRadius: 12,
+                          border: '1px solid #e5e7eb'
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 700, color: BRAND.dark, marginBottom: 4 }}>{m.name}</div>
+                          <div style={{ fontSize: 13, color: BRAND.muted }}>
+                            الكمية: {m.quantity} {m.unit} | التكلفة: ${m.cost.toLocaleString()}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveMaterial(m.id)}
+                          style={{
+                            padding: '8px 16px',
+                            background: '#ef4444',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 8,
+                            cursor: 'pointer',
+                            fontWeight: 600
+                          }}
+                        >
+                          حذف
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* Tab 3: المهندسين والمتعاقدين */}
+            {activeTab === 3 && (
+              <div style={{ display: 'grid', gap: 16 }}>
+                <div style={{
+                  padding: 16,
+                  background: '#f0f9ff',
+                  borderRadius: 12,
+                  border: `2px solid ${BRAND.accent}`
+                }}>
+                  <h4 style={{ margin: '0 0 12px 0', color: BRAND.primary, fontSize: 16 }}>إضافة مهندس</h4>
+                  <form onSubmit={handleAddEngineer} style={{ display: 'grid', gap: 12 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }}>
+                      <input
+                        type="text"
+                        placeholder="اسم المهندس *"
+                        value={newEngineer.name}
+                        onChange={(e) => setNewEngineer({ ...newEngineer, name: e.target.value })}
+                        required
+                        style={{
+                          padding: 12,
+                          border: '2px solid #e5e7eb',
+                          borderRadius: 8,
+                          fontSize: 14,
+                          outline: 'none'
+                        }}
+                      />
+                      <select
+                        value={newEngineer.specialty}
+                        onChange={(e) => setNewEngineer({ ...newEngineer, specialty: e.target.value })}
+                        style={{
+                          padding: 12,
+                          border: '2px solid #e5e7eb',
+                          borderRadius: 8,
+                          fontSize: 14,
+                          outline: 'none'
+                        }}
+                      >
+                        <option value="مدني">مدني</option>
+                        <option value="عمارة">عمارة</option>
+                        <option value="كهرباء">كهرباء</option>
+                      </select>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                      <input
+                        type="number"
+                        placeholder="الراتب *"
+                        value={newEngineer.salary}
+                        onChange={(e) => setNewEngineer({ ...newEngineer, salary: e.target.value })}
+                        min="0"
+                        required
+                        style={{
+                          padding: 12,
+                          border: '2px solid #e5e7eb',
+                          borderRadius: 8,
+                          fontSize: 14,
+                          outline: 'none'
+                        }}
+                      />
+                      <input
+                        type="tel"
+                        placeholder="الهاتف"
+                        value={newEngineer.phone}
+                        onChange={(e) => setNewEngineer({ ...newEngineer, phone: e.target.value })}
+                        style={{
+                          padding: 12,
+                          border: '2px solid #e5e7eb',
+                          borderRadius: 8,
+                          fontSize: 14,
+                          outline: 'none'
+                        }}
+                      />
+                      <input
+                        type="email"
+                        placeholder="البريد الإلكتروني"
+                        value={newEngineer.email}
+                        onChange={(e) => setNewEngineer({ ...newEngineer, email: e.target.value })}
+                        style={{
+                          padding: 12,
+                          border: '2px solid #e5e7eb',
+                          borderRadius: 8,
+                          fontSize: 14,
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+                    <textarea
+                      placeholder="ملاحظات"
+                      value={newEngineer.notes}
+                      onChange={(e) => setNewEngineer({ ...newEngineer, notes: e.target.value })}
+                      rows={2}
+                      style={{
+                        padding: 12,
+                        border: '2px solid #e5e7eb',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        outline: 'none',
+                        resize: 'vertical'
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      style={{
+                        padding: '12px 20px',
+                        background: BRAND.accent,
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 8,
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      إضافة مهندس
+                    </button>
+                  </form>
+                </div>
+                
+                {engineers.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: BRAND.muted }}>
+                    <div style={{ fontSize: 48, marginBottom: 12 }}>👷</div>
+                    <div style={{ fontSize: 16 }}>لا توجد مهندسين مضافة</div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gap: 12 }}>
+                    {engineers.map(e => (
+                      <div
+                        key={e.id}
+                        style={{
+                          padding: 16,
+                          background: BRAND.light,
+                          borderRadius: 12,
+                          border: '1px solid #e5e7eb'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div>
+                            <div style={{ fontWeight: 700, color: BRAND.dark, marginBottom: 4 }}>
+                              {e.name} - {e.specialty}
+                            </div>
+                            <div style={{ fontSize: 13, color: BRAND.muted }}>
+                              الراتب: ${e.salary.toLocaleString()} | {e.phone && `الهاتف: ${e.phone}`} {e.email && `| ${e.email}`}
+                            </div>
+                            {e.notes && (
+                              <div style={{ fontSize: 13, color: BRAND.muted, marginTop: 4 }}>{e.notes}</div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => handleRemoveEngineer(e.id)}
+                            style={{
+                              padding: '8px 16px',
+                              background: '#ef4444',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 8,
+                              cursor: 'pointer',
+                              fontWeight: 600
+                            }}
+                          >
+                            حذف
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                <div style={{
+                  marginTop: 24,
+                  padding: 16,
+                  background: '#f0f9ff',
+                  borderRadius: 12,
+                  border: `2px solid ${BRAND.accent}`
+                }}>
+                  <h4 style={{ margin: '0 0 12px 0', color: BRAND.primary, fontSize: 16 }}>إضافة فريق عمل</h4>
+                  <form onSubmit={handleAddCrew} style={{ display: 'flex', gap: 12 }}>
+                    <input
+                      type="text"
+                      placeholder="اسم الفريق"
+                      value={newCrew}
+                      onChange={(e) => setNewCrew(e.target.value)}
+                      style={{
+                        flex: 1,
+                        padding: 12,
+                        border: '2px solid #e5e7eb',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        outline: 'none'
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      style={{
+                        padding: '12px 20px',
+                        background: BRAND.accent,
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 8,
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      إضافة
+                    </button>
+                  </form>
+                </div>
+                
+                {crews.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {crews.map((crew, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          padding: '8px 16px',
+                          background: BRAND.light,
+                          borderRadius: 20,
+                          border: '1px solid #e5e7eb'
+                        }}
+                      >
+                        <span>{crew}</span>
+                        <button
+                          onClick={() => handleRemoveCrew(index)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: '#ef4444',
+                            cursor: 'pointer',
+                            fontSize: 18,
+                            padding: 0,
+                            width: 20,
+                            height: 20,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* Tab 4: صور المشروع */}
+            {activeTab === 4 && (
+              <div style={{ display: 'grid', gap: 16 }}>
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    style={{ display: 'none' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: BRAND.gradient,
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: 12,
+                      fontWeight: 700,
+                      fontSize: 16,
+                      cursor: uploading ? 'not-allowed' : 'pointer',
+                      opacity: uploading ? 0.7 : 1
+                    }}
+                  >
+                    {uploading ? '⏳ جاري الرفع...' : '📷 رفع صور المشروع'}
+                  </button>
+                </div>
+                
+                {images.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: BRAND.muted }}>
+                    <div style={{ fontSize: 48, marginBottom: 12 }}>📷</div>
+                    <div style={{ fontSize: 16 }}>لا توجد صور مرفوعة</div>
+                  </div>
+                ) : (
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                    gap: 12
+                  }}>
+                    {images.map((img, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          position: 'relative',
+                          paddingTop: '100%',
+                          background: BRAND.light,
+                          borderRadius: 12,
+                          overflow: 'hidden',
+                          border: '1px solid #e5e7eb'
+                        }}
+                      >
+                        <img
+                          src={img}
+                          alt={`Project ${index + 1}`}
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                          }}
+                        />
+                        <button
+                          onClick={() => handleRemoveImage(index)}
+                          style={{
+                            position: 'absolute',
+                            top: 8,
+                            left: 8,
+                            background: 'rgba(239, 68, 68, 0.9)',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: 28,
+                            height: 28,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: 18,
+                            fontWeight: 700
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* Tab 5: معلومات إضافية */}
+            {activeTab === 5 && (
+              <div style={{ display: 'grid', gap: 16 }}>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: 8,
+                    color: BRAND.dark,
+                    fontWeight: 600,
+                    fontSize: 14
+                  }}>
+                    الوصف
+                  </label>
+                  <textarea
+                    name="description"
+                    value={projectForm.description}
+                    onChange={handleProjectInput}
+                    placeholder="وصف مختصر عن المشروع"
+                    rows={4}
+                    style={{
+                      width: '100%',
+                      padding: 14,
+                      border: '2px solid #e5e7eb',
+                      borderRadius: 12,
+                      fontSize: 15,
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      background: BRAND.light,
+                      fontFamily: 'inherit',
+                      resize: 'vertical'
+                    }}
+                    onFocus={e => {
+                      e.target.style.borderColor = BRAND.accent;
+                      e.target.style.background = '#fff';
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = '#e5e7eb';
+                      e.target.style.background = BRAND.light;
+                    }}
+                  />
+                </div>
+                
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                   <div>
                     <label style={{
@@ -638,18 +1293,6 @@ export default function AddProjectAndRequests(){
                     }}
                   />
                 </div>
-              </>
-            ) : (
-              <div style={{
-                padding: '12px',
-                background: '#fef3c7',
-                borderRadius: 8,
-                border: '1px solid #fbbf24',
-                textAlign: 'center',
-                color: '#92400e',
-                fontSize: 13
-              }}>
-                💡 انقر على "⚙️ نموذج متقدم" أعلاه لإظهار الحقول الإضافية
               </div>
             )}
             
