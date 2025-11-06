@@ -419,7 +419,7 @@ export default function AddProjectAndRequests(){
       {/* Two Column Layout */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: activeTab === 2 ? '1fr' : 'repeat(auto-fit, minmax(400px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
         gap: 24
       }}>
         {/* Add Project Form */}
@@ -838,11 +838,134 @@ export default function AddProjectAndRequests(){
             {/* Tab 2: المواد اللازمة */}
             {activeTab === 2 && (
               <div style={{ display: 'grid', gap: 16 }}>
-                {/* محتوى المواد يظهر في قسم طلبات العملاء على اليمين */}
-                <div style={{ textAlign: 'center', padding: '40px 20px', color: BRAND.muted }}>
-                  <div style={{ fontSize: 48, marginBottom: 12 }}>🧱</div>
-                  <div style={{ fontSize: 16 }}>المواد اللازمة تظهر في قسم طلبات العملاء على اليمين</div>
+                <div style={{
+                  padding: 16,
+                  background: '#f0f9ff',
+                  borderRadius: 12,
+                  border: `2px solid ${BRAND.accent}`
+                }}>
+                  <h4 style={{ margin: '0 0 12px 0', color: BRAND.primary, fontSize: 16 }}>إضافة مادة جديدة</h4>
+                  <form onSubmit={handleAddMaterial} style={{ display: 'grid', gridTemplateColumns: window.innerWidth > 768 ? '2fr 1fr 1fr 1fr auto' : '1fr', gap: 12 }}>
+                    <input
+                      type="text"
+                      placeholder="اسم المادة"
+                      value={newMaterial.name}
+                      onChange={(e) => setNewMaterial({ ...newMaterial, name: e.target.value })}
+                      required
+                      style={{
+                        padding: 12,
+                        border: '2px solid #e5e7eb',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        outline: 'none'
+                      }}
+                    />
+                    <input
+                      type="number"
+                      placeholder="الكمية"
+                      value={newMaterial.quantity}
+                      onChange={(e) => setNewMaterial({ ...newMaterial, quantity: e.target.value })}
+                      min="0"
+                      step="0.01"
+                      required
+                      style={{
+                        padding: 12,
+                        border: '2px solid #e5e7eb',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        outline: 'none'
+                      }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="الوحدة"
+                      value={newMaterial.unit}
+                      onChange={(e) => setNewMaterial({ ...newMaterial, unit: e.target.value })}
+                      style={{
+                        padding: 12,
+                        border: '2px solid #e5e7eb',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        outline: 'none'
+                      }}
+                    />
+                    <input
+                      type="number"
+                      placeholder="التكلفة"
+                      value={newMaterial.cost}
+                      onChange={(e) => setNewMaterial({ ...newMaterial, cost: e.target.value })}
+                      min="0"
+                      step="0.01"
+                      required
+                      style={{
+                        padding: 12,
+                        border: '2px solid #e5e7eb',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        outline: 'none'
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      style={{
+                        padding: '12px 20px',
+                        background: BRAND.accent,
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 8,
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      إضافة
+                    </button>
+                  </form>
                 </div>
+                
+                {materials.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: BRAND.muted }}>
+                    <div style={{ fontSize: 48, marginBottom: 12 }}>🧱</div>
+                    <div style={{ fontSize: 16 }}>لا توجد مواد مضافة</div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gap: 12 }}>
+                    {materials.map(m => (
+                      <div
+                        key={m.id}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: 16,
+                          background: BRAND.light,
+                          borderRadius: 12,
+                          border: '1px solid #e5e7eb'
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 700, color: BRAND.dark, marginBottom: 4 }}>{m.name}</div>
+                          <div style={{ fontSize: 13, color: BRAND.muted }}>
+                            الكمية: {m.quantity} {m.unit} | التكلفة: ${m.cost.toLocaleString()}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveMaterial(m.id)}
+                          style={{
+                            padding: '8px 16px',
+                            background: '#ef4444',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 8,
+                            cursor: 'pointer',
+                            fontWeight: 600
+                          }}
+                        >
+                          حذف
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 
                 {/* أزرار السابق والتالي */}
                 <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
@@ -1610,163 +1733,9 @@ export default function AddProjectAndRequests(){
           borderRadius: 20,
           boxShadow: '0 4px 20px rgba(30,58,95,0.08)',
           padding: 28,
-          border: '1px solid rgba(30,58,95,0.05)',
-          display: activeTab === 2 ? 'grid' : 'block',
-          gridTemplateColumns: activeTab === 2 ? '1fr 1fr' : 'auto',
-          gap: activeTab === 2 ? 24 : 0
+          border: '1px solid rgba(30,58,95,0.05)'
         }}>
-          {activeTab === 2 && (
-            <div style={{ gridColumn: '1 / -1' }}>
-              <h3 style={{
-                margin: '0 0 24px 0',
-                color: BRAND.primary,
-                fontSize: 22,
-                fontWeight: 800
-              }}>
-                المواد اللازمة
-              </h3>
-            </div>
-          )}
-          
-          {activeTab === 2 && (
-            <div>
-              {/* محتوى المواد */}
-              <div style={{ display: 'grid', gap: 16 }}>
           <div style={{
-                  padding: 16,
-                  background: '#f0f9ff',
-                  borderRadius: 12,
-                  border: `2px solid ${BRAND.accent}`
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: BRAND.primary, fontSize: 16 }}>إضافة مادة جديدة</h4>
-                  <form onSubmit={handleAddMaterial} style={{ display: 'grid', gridTemplateColumns: window.innerWidth > 768 ? '2fr 1fr 1fr 1fr auto' : '1fr', gap: 12 }}>
-                    <input
-                      type="text"
-                      placeholder="اسم المادة"
-                      value={newMaterial.name}
-                      onChange={(e) => setNewMaterial({ ...newMaterial, name: e.target.value })}
-                      required
-                      style={{
-                        padding: 12,
-                        border: '2px solid #e5e7eb',
-                        borderRadius: 8,
-                        fontSize: 14,
-                        outline: 'none'
-                      }}
-                    />
-                    <input
-                      type="number"
-                      placeholder="الكمية"
-                      value={newMaterial.quantity}
-                      onChange={(e) => setNewMaterial({ ...newMaterial, quantity: e.target.value })}
-                      min="0"
-                      step="0.01"
-                      required
-                      style={{
-                        padding: 12,
-                        border: '2px solid #e5e7eb',
-                        borderRadius: 8,
-                        fontSize: 14,
-                        outline: 'none'
-                      }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="الوحدة"
-                      value={newMaterial.unit}
-                      onChange={(e) => setNewMaterial({ ...newMaterial, unit: e.target.value })}
-                      style={{
-                        padding: 12,
-                        border: '2px solid #e5e7eb',
-                        borderRadius: 8,
-                        fontSize: 14,
-                        outline: 'none'
-                      }}
-                    />
-                    <input
-                      type="number"
-                      placeholder="التكلفة"
-                      value={newMaterial.cost}
-                      onChange={(e) => setNewMaterial({ ...newMaterial, cost: e.target.value })}
-                      min="0"
-                      step="0.01"
-                      required
-                      style={{
-                        padding: 12,
-                        border: '2px solid #e5e7eb',
-                        borderRadius: 8,
-                        fontSize: 14,
-                        outline: 'none'
-                      }}
-                    />
-                    <button
-                      type="submit"
-                      style={{
-                        padding: '12px 20px',
-                        background: BRAND.accent,
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: 8,
-                        fontWeight: 700,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      إضافة
-                    </button>
-                  </form>
-                </div>
-                
-                {materials.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '40px 20px', color: BRAND.muted }}>
-                    <div style={{ fontSize: 48, marginBottom: 12 }}>🧱</div>
-                    <div style={{ fontSize: 16 }}>لا توجد مواد مضافة</div>
-                  </div>
-                ) : (
-                  <div style={{ display: 'grid', gap: 12 }}>
-                    {materials.map(m => (
-                      <div
-                        key={m.id}
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          padding: 16,
-                          background: BRAND.light,
-                          borderRadius: 12,
-                          border: '1px solid #e5e7eb'
-                        }}
-                      >
-                        <div>
-                          <div style={{ fontWeight: 700, color: BRAND.dark, marginBottom: 4 }}>{m.name}</div>
-                          <div style={{ fontSize: 13, color: BRAND.muted }}>
-                            الكمية: {m.quantity} {m.unit} | التكلفة: ${m.cost.toLocaleString()}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleRemoveMaterial(m.id)}
-                          style={{
-                            padding: '8px 16px',
-                            background: '#ef4444',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 8,
-                            cursor: 'pointer',
-                            fontWeight: 600
-                          }}
-                        >
-                          حذف
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          
-          {/* طلبات العملاء */}
-          <div>
-            <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: 12,
