@@ -1,11 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const Material = require('../models/Material');
+const { optionalAuth } = require('../middleware/auth');
+
+router.use(optionalAuth);
 
 router.get('/', async (req, res) => {
   try {
     const { category, status, lowStock } = req.query;
     const query = {};
+    
+    // عزل البيانات: المواد مشتركة بين جميع المقاولين (يمكن تعديلها لاحقاً)
+    // حالياً، جميع المقاولين يرون جميع المواد
     
     if (category) query.category = category;
     if (status) query.status = status;
@@ -93,6 +99,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 

@@ -1,11 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const Supplier = require('../models/Supplier');
+const { optionalAuth } = require('../middleware/auth');
+
+router.use(optionalAuth);
 
 router.get('/', async (req, res) => {
   try {
     const { status } = req.query;
     const query = status ? { status } : {};
+    
+    // عزل البيانات: الموردون مشتركون بين جميع المقاولين (يمكن تعديلها لاحقاً)
+    // حالياً، جميع المقاولين يرون جميع الموردين
+    
     const suppliers = await Supplier.find(query);
     res.json(suppliers);
   } catch (error) {
@@ -65,6 +72,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 

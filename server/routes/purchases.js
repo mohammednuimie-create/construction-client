@@ -1,14 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const Purchase = require('../models/Purchase');
+const Project = require('../models/Project');
+const { optionalAuth } = require('../middleware/auth');
+
+router.use(optionalAuth);
 
 router.get('/', async (req, res) => {
   try {
     const { supplier, project, status } = req.query;
     const query = {};
     
+    // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط مشترياته
+    if (req.user && req.userRole === 'contractor') {
+      // المقاول يرى فقط المشتريات لمشاريعه
+      const userProjects = await Project.find({ contractor: req.userId }).select('_id');
+      const projectIds = userProjects.map(p => p._id);
+      query.project = { $in: projectIds };
+    }
+    
     if (supplier) query.supplier = supplier;
-    if (project) query.project = project;
+    if (project && !req.user) query.project = project;
     if (status) query.status = status;
     
     const purchases = await Purchase.find(query)
@@ -39,6 +51,14 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
+    // عزل البيانات: التحقق من أن المشروع يخص المقاول
+    if (req.user && req.userRole === 'contractor' && req.body.project) {
+      const project = await Project.findById(req.body.project);
+      if (!project || project.contractor?.toString() !== req.userId.toString()) {
+        return res.status(403).json({ error: 'You do not have permission to create purchase for this project' });
+      }
+    }
+    
     const purchase = new Purchase(req.body);
     await purchase.save();
     
@@ -54,16 +74,26 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const purchase = await Purchase.findByIdAndUpdate(
+    // عزل البيانات: التحقق من أن المشتري يخص المقاول
+    const purchase = await Purchase.findById(req.params.id).populate('project');
+    if (!purchase) {
+      return res.status(404).json({ error: 'Purchase not found' });
+    }
+    
+    if (req.user && req.userRole === 'contractor') {
+      const project = await Project.findById(purchase.project?._id || purchase.project);
+      if (!project || project.contractor?.toString() !== req.userId.toString()) {
+        return res.status(403).json({ error: 'You do not have permission to update this purchase' });
+      }
+    }
+    
+    const updatedPurchase = await Purchase.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true }
     ).populate('supplier').populate('project');
     
-    if (!purchase) {
-      return res.status(404).json({ error: 'Purchase not found' });
-    }
-    res.json(purchase);
+    res.json(updatedPurchase);
   } catch (error) {
     res.status(400).json({ error: 'Failed to update purchase', message: error.message });
   }
@@ -71,10 +101,20 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    const purchase = await Purchase.findByIdAndDelete(req.params.id);
+    // عزل البيانات: التحقق من أن المشتري يخص المقاول
+    const purchase = await Purchase.findById(req.params.id).populate('project');
     if (!purchase) {
       return res.status(404).json({ error: 'Purchase not found' });
     }
+    
+    if (req.user && req.userRole === 'contractor') {
+      const project = await Project.findById(purchase.project?._id || purchase.project);
+      if (!project || project.contractor?.toString() !== req.userId.toString()) {
+        return res.status(403).json({ error: 'You do not have permission to delete this purchase' });
+      }
+    }
+    
+    await Purchase.findByIdAndDelete(req.params.id);
     res.json({ message: 'Purchase deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete purchase', message: error.message });

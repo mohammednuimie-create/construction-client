@@ -1,14 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const Request = require('../models/Request');
+const { optionalAuth } = require('../middleware/auth');
+
+router.use(optionalAuth);
 
 router.get('/', async (req, res) => {
   try {
     const { client, contractor, status, priority } = req.query;
     const query = {};
     
-    if (client) query.client = client;
-    if (contractor) query.contractor = contractor;
+    // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط بياناته
+    if (req.user) {
+      if (req.userRole === 'contractor') {
+        // المقاول يرى فقط طلباته
+        query.contractor = req.userId;
+      } else if (req.userRole === 'client') {
+        // العميل يرى فقط طلباته
+        query.client = req.userId;
+      }
+    }
+    
+    if (client && !req.user) query.client = client;
+    if (contractor && req.userRole !== 'contractor') query.contractor = contractor;
     if (status) query.status = status;
     if (priority) query.priority = priority;
     
@@ -42,6 +56,11 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
+    // عزل البيانات: إضافة client تلقائياً إذا كان المستخدم عميل
+    if (req.user && req.userRole === 'client') {
+      req.body.client = req.userId;
+    }
+    
     const request = new Request(req.body);
     await request.save();
     
@@ -58,6 +77,22 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
+    // عزل البيانات: التحقق من أن المستخدم يملك الطلب
+    const request = await Request.findById(req.params.id);
+    if (!request) {
+      return res.status(404).json({ error: 'Request not found' });
+    }
+    
+    if (req.user) {
+      const isOwner = 
+        (req.userRole === 'contractor' && request.contractor?.toString() === req.userId.toString()) ||
+        (req.userRole === 'client' && request.client?.toString() === req.userId.toString());
+      
+      if (!isOwner) {
+        return res.status(403).json({ error: 'You do not have permission to update this request' });
+      }
+    }
+    
     const { status } = req.body;
     const updateData = { ...req.body };
     
@@ -65,17 +100,13 @@ router.put('/:id', async (req, res) => {
       updateData.responseDate = new Date();
     }
     
-    const request = await Request.findByIdAndUpdate(
+    const updatedRequest = await Request.findByIdAndUpdate(
       req.params.id,
       updateData,
       { new: true, runValidators: true }
     ).populate('project').populate('client').populate('contractor');
     
-    if (!request) {
-      return res.status(404).json({ error: 'Request not found' });
-    }
-    
-    res.json(request);
+    res.json(updatedRequest);
   } catch (error) {
     res.status(400).json({ error: 'Failed to update request', message: error.message });
   }
@@ -83,10 +114,23 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    const request = await Request.findByIdAndDelete(req.params.id);
+    // عزل البيانات: التحقق من أن المستخدم يملك الطلب
+    const request = await Request.findById(req.params.id);
     if (!request) {
       return res.status(404).json({ error: 'Request not found' });
     }
+    
+    if (req.user) {
+      const isOwner = 
+        (req.userRole === 'contractor' && request.contractor?.toString() === req.userId.toString()) ||
+        (req.userRole === 'client' && request.client?.toString() === req.userId.toString());
+      
+      if (!isOwner) {
+        return res.status(403).json({ error: 'You do not have permission to delete this request' });
+      }
+    }
+    
+    await Request.findByIdAndDelete(req.params.id);
     res.json({ message: 'Request deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete request', message: error.message });
@@ -94,6 +138,8 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+
 
 
 
