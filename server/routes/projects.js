@@ -2,22 +2,36 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const Project = require('../models/Project');
+const { authenticate, optionalAuth } = require('../middleware/auth');
+
+// استخدام optionalAuth - يضيف المستخدم إذا كان موجوداً
+router.use(optionalAuth);
 
 router.get('/', async (req, res) => {
   try {
     const { client, contractor, status } = req.query;
     const query = {};
     
+    // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط بياناته
+    if (req.user) {
+      if (req.userRole === 'contractor') {
+        // المقاول يرى فقط مشاريعه
+        query.contractor = req.userId;
+      } else if (req.userRole === 'client') {
+        // العميل يرى فقط مشاريعه
+        query.client = req.userId;
+      }
+    }
+    
     // Filter by client (supports both ObjectId and String for backward compatibility)
-    if (client) {
+    if (client && !req.user) {
+      // فقط إذا لم يكن المستخدم مسجل دخوله (للإدارة)
       if (mongoose.Types.ObjectId.isValid(client)) {
-        // Search for both ObjectId and String to support old data
         query.$or = [
-          { client: new mongoose.Types.ObjectId(client) }, // New format: ObjectId
-          { client: client.toString() } // Old format: String
+          { client: new mongoose.Types.ObjectId(client) },
+          { client: client.toString() }
         ];
       } else {
-        // If not a valid ObjectId, search as string
         query.$or = [
           { client: client },
           { client: { $regex: client, $options: 'i' } }
@@ -25,8 +39,8 @@ router.get('/', async (req, res) => {
       }
     }
     
-    // Filter by contractor (ObjectId)
-    if (contractor) {
+    // Filter by contractor (ObjectId) - فقط إذا لم يكن المستخدم مقاول
+    if (contractor && req.userRole !== 'contractor') {
       query.contractor = contractor;
     }
     
@@ -61,6 +75,17 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
+    // عزل البيانات: إضافة contractor تلقائياً إذا كان المستخدم مقاول
+    if (req.user && req.userRole === 'contractor') {
+      req.body.contractor = req.userId;
+      req.body.createdBy = req.userId;
+    }
+    // عزل البيانات: إضافة client تلقائياً إذا كان المستخدم عميل
+    if (req.user && req.userRole === 'client') {
+      req.body.client = req.userId;
+      req.body.createdBy = req.userId;
+    }
+    
     const project = new Project(req.body);
     await project.save();
     res.status(201).json(project);
@@ -71,17 +96,31 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const project = await Project.findByIdAndUpdate(
+    // عزل البيانات: التحقق من أن المستخدم يملك المشروع
+    const project = await Project.findById(req.params.id);
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    
+    if (req.user) {
+      const isOwner = 
+        (req.userRole === 'contractor' && project.contractor?.toString() === req.userId.toString()) ||
+        (req.userRole === 'client' && project.client?.toString() === req.userId.toString());
+      
+      if (!isOwner) {
+        return res.status(403).json({ error: 'You do not have permission to update this project' });
+      }
+    }
+    
+    const updatedProject = await Project.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true }
     )
       .populate('contractor', 'name companyName email')
       .populate('client', 'name email');
-    if (!project) {
-      return res.status(404).json({ error: 'Project not found' });
-    }
-    res.json(project);
+    
+    res.json(updatedProject);
   } catch (error) {
     res.status(400).json({ error: 'Failed to update project', message: error.message });
   }
@@ -89,10 +128,23 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    const project = await Project.findByIdAndDelete(req.params.id);
+    // عزل البيانات: التحقق من أن المستخدم يملك المشروع
+    const project = await Project.findById(req.params.id);
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
     }
+    
+    if (req.user) {
+      const isOwner = 
+        (req.userRole === 'contractor' && project.contractor?.toString() === req.userId.toString()) ||
+        (req.userRole === 'client' && project.client?.toString() === req.userId.toString());
+      
+      if (!isOwner) {
+        return res.status(403).json({ error: 'You do not have permission to delete this project' });
+      }
+    }
+    
+    await Project.findByIdAndDelete(req.params.id);
     res.json({ message: 'Project deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete project', message: error.message });
