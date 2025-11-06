@@ -45,9 +45,9 @@ const optionalAuth = async (req, res, next) => {
         
         if (user) {
           req.user = user;
-          req.userId = user._id;
+          req.userId = user._id.toString(); // تحويل إلى String للتأكد من التوافق
           req.userRole = user.role;
-          console.log(`✅ [Auth] User authenticated: ${user.name} (${user.role}) - ID: ${user._id}`);
+          console.log(`✅ [Auth] User authenticated: ${user.name} (${user.role}) - ID: ${req.userId} (type: ${typeof req.userId})`);
         } else {
           console.log(`⚠️ [Auth] Token valid but user not found: ${decoded.userId}`);
         }
