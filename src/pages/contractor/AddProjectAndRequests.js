@@ -1875,6 +1875,7 @@ export default function AddProjectAndRequests(){
               )}
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>
