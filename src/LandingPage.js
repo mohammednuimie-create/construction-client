@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const BRAND = {
-  primary: '#0f172a',
-  accent: '#06b6d4',
-  secondary: '#3b82f6',
-  gradient: 'linear-gradient(135deg, #0f172a 0%, #1e40af 50%, #06b6d4 100%)',
-  gradientLight: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
-  dark: '#0a0f1c',
-  light: '#f1f5f9',
+  primary: '#1e3a5f',
+  accent: '#2a9d8f',
+  secondary: '#264653',
+  gradient: 'linear-gradient(135deg, #1e3a5f 0%, #2a9d8f 50%, #264653 100%)',
+  gradientLight: 'linear-gradient(135deg, #1e3a5f 0%, #2a9d8f 100%)',
+  dark: '#0f172a',
+  light: '#f8fafc',
   muted: '#64748b',
   success: '#10b981',
   warning: '#f59e0b',
@@ -78,7 +78,7 @@ export default function LandingPage() {
       icon: '⚡',
       title: 'سرعة التنفيذ',
       desc: 'نوفر حلول سريعة مع الحفاظ على أعلى معايير الجودة',
-      color: '#3b82f6'
+      color: '#1e3a5f'
     },
     {
       icon: '🔒',
@@ -96,7 +96,7 @@ export default function LandingPage() {
       icon: '📊',
       title: 'إدارة متطورة',
       desc: 'نظام إدارة متكامل لمتابعة المشاريع',
-      color: '#06b6d4'
+      color: '#2a9d8f'
     },
   ];
 
@@ -195,7 +195,7 @@ export default function LandingPage() {
         left: 0,
         right: 0,
         zIndex: 1000,
-        background: isScrolled ? 'rgba(15, 23, 42, 0.95)' : 'transparent',
+        background: isScrolled ? 'rgba(30, 58, 95, 0.95)' : 'transparent',
         backdropFilter: 'blur(20px)',
         transition: 'all 0.3s ease',
         borderBottom: isScrolled ? '1px solid rgba(255,255,255,0.1)' : 'none'
@@ -223,7 +223,7 @@ export default function LandingPage() {
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 24,
-              boxShadow: '0 8px 25px rgba(6, 182, 212, 0.4)'
+              boxShadow: '0 8px 25px rgba(42, 157, 143, 0.4)'
             }}>🏗️</div>
             <div>
               <div style={{
@@ -307,16 +307,16 @@ export default function LandingPage() {
                   cursor: 'pointer',
                   fontWeight: 700,
                   fontSize: 15,
-                  boxShadow: '0 4px 20px rgba(6, 182, 212, 0.4)',
+                  boxShadow: '0 4px 20px rgba(42, 157, 143, 0.4)',
                   transition: 'all 0.3s ease'
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 8px 30px rgba(6, 182, 212, 0.5)';
+                  e.currentTarget.style.boxShadow = '0 8px 30px rgba(42, 157, 143, 0.5)';
                 }}
                 onMouseOut={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(6, 182, 212, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(42, 157, 143, 0.4)';
                 }}
               >
                 تسجيل الدخول
@@ -339,13 +339,13 @@ export default function LandingPage() {
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%)',
+          background: 'radial-gradient(circle at 20% 50%, rgba(42, 157, 143, 0.3) 0%, transparent 50%)',
           pointerEvents: 'none'
         }} />
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.2) 0%, transparent 50%)',
+          background: 'radial-gradient(circle at 80% 80%, rgba(30, 58, 95, 0.2) 0%, transparent 50%)',
           pointerEvents: 'none'
         }} />
         
@@ -388,7 +388,7 @@ export default function LandingPage() {
               }}>
                 نحن نبني<br />
                 <span style={{
-                  background: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
+                  background: 'linear-gradient(135deg, #2a9d8f 0%, #1e3a5f 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
@@ -1011,18 +1011,18 @@ export default function LandingPage() {
                 fontWeight: 700,
                 fontSize: 18,
                 cursor: 'pointer',
-                boxShadow: '0 8px 30px rgba(6, 182, 212, 0.4)',
+                boxShadow: '0 8px 30px rgba(42, 157, 143, 0.4)',
                 transition: 'all 0.3s ease',
                 justifySelf: 'center',
                 minWidth: 250
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 12px 40px rgba(6, 182, 212, 0.5)';
+                e.currentTarget.style.boxShadow = '0 12px 40px rgba(42, 157, 143, 0.5)';
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 8px 30px rgba(6, 182, 212, 0.4)';
+                e.currentTarget.style.boxShadow = '0 8px 30px rgba(42, 157, 143, 0.4)';
               }}
             >
               إرسال الرسالة ✉️
