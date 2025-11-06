@@ -42,12 +42,23 @@ router.get('/', async (req, res) => {
       query.status = status;
     }
     
+    console.log(`🔍 [Projects GET] Query:`, JSON.stringify(query, null, 2));
+    
     const projects = await Project.find(query)
       .populate('contractor', 'name companyName email')
       .populate('client', 'name email')
       .sort({ createdAt: -1 });
     
     console.log(`✅ [Projects GET] Found ${projects.length} projects for user ${req.user ? req.user.name : 'anonymous'}`);
+    
+    // Log project details for debugging
+    if (projects.length > 0) {
+      console.log(`📋 [Projects GET] Projects found:`);
+      projects.forEach((p, idx) => {
+        console.log(`  ${idx + 1}. "${p.name}" - Contractor: ${p.contractor?._id || p.contractor || 'NONE'} (${p.contractor?.name || 'N/A'}), Client: ${p.client?._id || p.client || 'NONE'}`);
+      });
+    }
+    
     res.json(projects);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch projects', message: error.message });
