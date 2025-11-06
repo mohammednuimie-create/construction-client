@@ -146,36 +146,61 @@ router.post('/google/callback', async (req, res) => {
     console.log('Exchanging code for token:', {
       redirectUri: redirectUri,
       hasCode: !!code,
-      codeLength: code?.length
+      codeLength: code?.length,
+      clientId: clientId ? `${clientId.substring(0, 20)}...` : 'MISSING',
+      hasClientSecret: !!clientSecret
     });
 
     // Exchange code for access token
+    const tokenRequestParams = {
+      code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code'
+    };
+
+    console.log('Token request params:', {
+      code: code?.substring(0, 20) + '...',
+      client_id: clientId ? `${clientId.substring(0, 20)}...` : 'MISSING',
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code'
+    });
+
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        code,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUri,
-        grant_type: 'authorization_code'
-      })
+      body: new URLSearchParams(tokenRequestParams)
     });
 
     const tokenData = await tokenResponse.json();
     
+    console.log('Token response status:', tokenResponse.status);
+    console.log('Token response data:', tokenData);
+    
     if (!tokenResponse.ok) {
-      console.error('Failed to exchange code for token:', tokenData);
+      console.error('Failed to exchange code for token:', {
+        status: tokenResponse.status,
+        error: tokenData.error,
+        error_description: tokenData.error_description
+      });
+      
+      let hint = 'Please check your Google OAuth configuration.';
+      if (tokenData.error === 'invalid_grant') {
+        hint = 'The authorization code may have expired or already been used. Please try logging in again.';
+      } else if (tokenData.error === 'redirect_uri_mismatch') {
+        hint = `Redirect URI mismatch. Expected: ${redirectUri}. Make sure this exact URL is added to Authorized redirect URIs in Google Cloud Console.`;
+      } else if (tokenData.error === 'invalid_client') {
+        hint = 'Invalid client credentials. Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in your .env file.';
+      } else if (tokenData.error_description) {
+        hint = tokenData.error_description;
+      }
+      
       return res.status(400).json({ 
         error: 'Failed to exchange code for token', 
         details: tokenData,
-        hint: tokenData.error === 'invalid_grant' 
-          ? 'The authorization code may have expired or already been used. Please try logging in again.'
-          : tokenData.error === 'redirect_uri_mismatch'
-          ? `Redirect URI mismatch. Make sure ${redirectUri} is added to Authorized redirect URIs in Google Cloud Console.`
-          : tokenData.error === 'invalid_client'
-          ? 'Invalid client credentials. Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.'
-          : 'Please check your Google OAuth configuration.'
+        hint: hint,
+        redirectUri: redirectUri
       });
     }
 

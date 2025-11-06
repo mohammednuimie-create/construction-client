@@ -138,19 +138,25 @@ function GoogleCallbackHandler() {
           }
         } catch (error) {
           console.error('Google callback error:', error);
+          console.error('Error details:', error.details);
+          console.error('Error hint:', error.hint);
+          
           let errorMessage = error.message || 'فشل تسجيل الدخول عبر Google';
           
           // Show more detailed error if available
-          if (error.details) {
-            console.error('Error details:', error.details);
+          if (error.hint) {
+            errorMessage = error.hint;
+          } else if (error.details) {
             if (error.details.error === 'redirect_uri_mismatch') {
-              errorMessage = 'خطأ في إعدادات Google OAuth: Redirect URI غير متطابق. يرجى التحقق من الإعدادات.';
+              errorMessage = `خطأ: Redirect URI غير متطابق.\n\nالمتوقع: ${error.redirectUri || 'http://localhost:3000/auth/google/callback'}\n\nيرجى التأكد من إضافة هذا الرابط بالضبط في Google Cloud Console → Authorized redirect URIs`;
             } else if (error.details.error === 'invalid_client') {
-              errorMessage = 'خطأ في إعدادات Google OAuth: Client ID أو Client Secret غير صحيح.';
+              errorMessage = 'خطأ: Client ID أو Client Secret غير صحيح.\n\nيرجى التحقق من ملف .env في مجلد server/';
             } else if (error.details.error === 'invalid_grant') {
-              errorMessage = 'انتهت صلاحية رمز المصادقة. يرجى المحاولة مرة أخرى.';
+              errorMessage = 'انتهت صلاحية رمز المصادقة.\n\nيرجى المحاولة مرة أخرى.';
             } else if (error.details.error_description) {
               errorMessage = `خطأ: ${error.details.error_description}`;
+            } else if (error.details.error) {
+              errorMessage = `خطأ: ${error.details.error}`;
             }
           }
           
