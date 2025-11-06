@@ -12,15 +12,21 @@ router.get('/', async (req, res) => {
     const { client, contractor, status } = req.query;
     const query = {};
     
+    console.log(`📥 [Projects GET] User: ${req.user ? `${req.user.name} (${req.userRole})` : 'NOT AUTHENTICATED'}, ID: ${req.userId || 'N/A'}`);
+    
     // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط بياناته
-    if (req.user) {
+    if (req.user && req.userId) {
       if (req.userRole === 'contractor') {
         // المقاول يرى فقط مشاريعه
         query.contractor = req.userId;
+        console.log(`🔒 [Projects GET] Filtering by contractor: ${req.userId}`);
       } else if (req.userRole === 'client') {
         // العميل يرى فقط مشاريعه
         query.client = req.userId;
+        console.log(`🔒 [Projects GET] Filtering by client: ${req.userId}`);
       }
+    } else {
+      console.log(`⚠️ [Projects GET] No user authentication - returning all projects`);
     }
     
     // Filter by client (supports both ObjectId and String for backward compatibility)
@@ -53,6 +59,8 @@ router.get('/', async (req, res) => {
       .populate('contractor', 'name companyName email')
       .populate('client', 'name email')
       .sort({ createdAt: -1 });
+    
+    console.log(`✅ [Projects GET] Found ${projects.length} projects for user ${req.user ? req.user.name : 'anonymous'}`);
     res.json(projects);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch projects', message: error.message });
