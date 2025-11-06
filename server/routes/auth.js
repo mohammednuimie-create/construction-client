@@ -4,6 +4,29 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
+const { optionalAuth } = require('../middleware/auth');
+
+// Get current user info
+router.get('/me', optionalAuth, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+    res.json({
+      user: {
+        id: req.user._id,
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role
+      },
+      userId: req.userId,
+      userRole: req.userRole
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get user info', message: error.message });
+  }
+});
 
 router.post('/register', async (req, res) => {
   try {
