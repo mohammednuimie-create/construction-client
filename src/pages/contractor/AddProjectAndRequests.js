@@ -80,7 +80,7 @@ export default function AddProjectAndRequests(){
         try {
           const materialsData = await materialsAPI.getAll();
           setAvailableMaterials(materialsData || []);
-        } catch (err) {
+      } catch (err) {
           console.error('Error fetching materials:', err);
         }
       } catch (err) {
@@ -419,7 +419,7 @@ export default function AddProjectAndRequests(){
       {/* Two Column Layout */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gridTemplateColumns: activeTab === 2 ? '1fr' : 'repeat(auto-fit, minmax(400px, 1fr))',
         gap: 24
       }}>
         {/* Add Project Form */}
@@ -442,27 +442,27 @@ export default function AddProjectAndRequests(){
               display: 'flex',
               alignItems: 'center',
               gap: 12
+          }}>
+            <div style={{
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              background: BRAND.gradient,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 20
             }}>
-              <div style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                background: BRAND.gradient,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 20
-              }}>
-                ➕
-              </div>
-              <h3 style={{
-                margin: 0,
-                color: BRAND.primary,
-                fontSize: 22,
-                fontWeight: 800
-              }}>
-                إضافة مشروع جديد
-              </h3>
+              ➕
+            </div>
+            <h3 style={{
+              margin: 0,
+              color: BRAND.primary,
+              fontSize: 22,
+              fontWeight: 800
+            }}>
+              إضافة مشروع جديد
+            </h3>
             </div>
             {!showProjectForm && (
               <button
@@ -681,51 +681,51 @@ export default function AddProjectAndRequests(){
               {/* Tab 1: معلومات أساسية */}
               {activeTab === 1 && (
               <div style={{ display: 'grid', gap: 16 }}>
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: 8,
-                    color: BRAND.dark,
-                    fontWeight: 600,
-                    fontSize: 14
-                  }}>
-                    اسم المشروع *
-                  </label>
-                  <input
-                    name="name"
-                    value={projectForm.name}
-                    onChange={handleProjectInput}
-                    placeholder="أدخل اسم المشروع"
-                    required
-                    style={{
-                      width: '100%',
-                      padding: 14,
-                      border: '2px solid #e5e7eb',
-                      borderRadius: 12,
-                      fontSize: 15,
-                      outline: 'none',
-                      transition: 'all 0.3s ease',
-                      background: BRAND.light
-                    }}
-                    onFocus={e => {
-                      e.target.style.borderColor = BRAND.accent;
-                      e.target.style.background = '#fff';
-                    }}
-                    onBlur={e => {
-                      e.target.style.borderColor = '#e5e7eb';
-                      e.target.style.background = BRAND.light;
-                    }}
-                  />
-                </div>
-                
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: 8,
-                    color: BRAND.dark,
-                    fontWeight: 600,
-                    fontSize: 14
-                  }}>
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: 8,
+                color: BRAND.dark,
+                fontWeight: 600,
+                fontSize: 14
+              }}>
+                اسم المشروع *
+              </label>
+              <input
+                name="name"
+                value={projectForm.name}
+                onChange={handleProjectInput}
+                placeholder="أدخل اسم المشروع"
+                required
+                style={{
+                  width: '100%',
+                  padding: 14,
+                  border: '2px solid #e5e7eb',
+                  borderRadius: 12,
+                  fontSize: 15,
+                  outline: 'none',
+                  transition: 'all 0.3s ease',
+                  background: BRAND.light
+                }}
+                onFocus={e => {
+                  e.target.style.borderColor = BRAND.accent;
+                  e.target.style.background = '#fff';
+                }}
+                onBlur={e => {
+                  e.target.style.borderColor = '#e5e7eb';
+                  e.target.style.background = BRAND.light;
+                }}
+              />
+            </div>
+            
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: 8,
+                color: BRAND.dark,
+                fontWeight: 600,
+                fontSize: 14
+              }}>
                     الموقع
                   </label>
                   <input
@@ -763,37 +763,37 @@ export default function AddProjectAndRequests(){
                     fontSize: 14
                   }}>
                     الميزانية البدائية ($) *
-                  </label>
-                  <input
-                    name="budget"
-                    type="number"
-                    value={projectForm.budget}
-                    onChange={handleProjectInput}
-                    placeholder="0"
-                    min="0"
-                    step="0.01"
-                    required
-                    style={{
-                      width: '100%',
-                      padding: 14,
-                      border: '2px solid #e5e7eb',
-                      borderRadius: 12,
-                      fontSize: 15,
-                      outline: 'none',
-                      transition: 'all 0.3s ease',
-                      background: BRAND.light
-                    }}
-                    onFocus={e => {
-                      e.target.style.borderColor = BRAND.accent;
-                      e.target.style.background = '#fff';
-                    }}
-                    onBlur={e => {
-                      e.target.style.borderColor = '#e5e7eb';
-                      e.target.style.background = BRAND.light;
-                    }}
-                  />
-                </div>
-                
+              </label>
+              <input
+                name="budget"
+                type="number"
+                value={projectForm.budget}
+                onChange={handleProjectInput}
+                placeholder="0"
+                min="0"
+                step="0.01"
+                required
+                style={{
+                  width: '100%',
+                  padding: 14,
+                  border: '2px solid #e5e7eb',
+                  borderRadius: 12,
+                  fontSize: 15,
+                  outline: 'none',
+                  transition: 'all 0.3s ease',
+                  background: BRAND.light
+                }}
+                onFocus={e => {
+                  e.target.style.borderColor = BRAND.accent;
+                  e.target.style.background = '#fff';
+                }}
+                onBlur={e => {
+                  e.target.style.borderColor = '#e5e7eb';
+                  e.target.style.background = BRAND.light;
+                }}
+              />
+            </div>
+            
                 <div>
                   <label style={{
                     display: 'block',
@@ -802,13 +802,12 @@ export default function AddProjectAndRequests(){
                     fontWeight: 600,
                     fontSize: 14
                   }}>
-                    العميل *
+                    العميل
                   </label>
                   <select
                     name="client"
                     value={projectForm.client}
                     onChange={handleProjectInput}
-                    required
                     style={{
                       width: '100%',
                       padding: 14,
@@ -840,140 +839,77 @@ export default function AddProjectAndRequests(){
                     )}
                   </select>
                 </div>
+                
+                {/* زر التالي */}
+                <button
+                  type="button"
+                  onClick={() => handleTabChange(2)}
+                  style={{
+                    width: '100%',
+                    background: BRAND.gradient,
+                    color: '#fff',
+                    border: 0,
+                    borderRadius: 12,
+                    padding: '14px 24px',
+                    fontWeight: 700,
+                    fontSize: 16,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 15px rgba(42,157,143,0.3)',
+                    transition: 'all 0.3s ease',
+                    marginTop: 8
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(42,157,143,0.4)';
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(42,157,143,0.3)';
+                  }}
+                >
+                  التالي →
+                </button>
               </div>
-            )}
+              )}
             
             {/* Tab 2: المواد اللازمة */}
             {activeTab === 2 && (
               <div style={{ display: 'grid', gap: 16 }}>
-                <div style={{
-                  padding: 16,
-                  background: '#f0f9ff',
-                  borderRadius: 12,
-                  border: `2px solid ${BRAND.accent}`
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: BRAND.primary, fontSize: 16 }}>إضافة مادة جديدة</h4>
-                  <form onSubmit={handleAddMaterial} style={{ display: 'grid', gridTemplateColumns: window.innerWidth > 768 ? '2fr 1fr 1fr 1fr auto' : '1fr', gap: 12 }}>
-                    <input
-                      type="text"
-                      placeholder="اسم المادة"
-                      value={newMaterial.name}
-                      onChange={(e) => setNewMaterial({ ...newMaterial, name: e.target.value })}
-                      required
-                      style={{
-                        padding: 12,
-                        border: '2px solid #e5e7eb',
-                        borderRadius: 8,
-                        fontSize: 14,
-                        outline: 'none'
-                      }}
-                    />
-                    <input
-                      type="number"
-                      placeholder="الكمية"
-                      value={newMaterial.quantity}
-                      onChange={(e) => setNewMaterial({ ...newMaterial, quantity: e.target.value })}
-                      min="0"
-                      step="0.01"
-                      required
-                      style={{
-                        padding: 12,
-                        border: '2px solid #e5e7eb',
-                        borderRadius: 8,
-                        fontSize: 14,
-                        outline: 'none'
-                      }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="الوحدة"
-                      value={newMaterial.unit}
-                      onChange={(e) => setNewMaterial({ ...newMaterial, unit: e.target.value })}
-                      style={{
-                        padding: 12,
-                        border: '2px solid #e5e7eb',
-                        borderRadius: 8,
-                        fontSize: 14,
-                        outline: 'none'
-                      }}
-                    />
-                    <input
-                      type="number"
-                      placeholder="التكلفة"
-                      value={newMaterial.cost}
-                      onChange={(e) => setNewMaterial({ ...newMaterial, cost: e.target.value })}
-                      min="0"
-                      step="0.01"
-                      required
-                      style={{
-                        padding: 12,
-                        border: '2px solid #e5e7eb',
-                        borderRadius: 8,
-                        fontSize: 14,
-                        outline: 'none'
-                      }}
-                    />
-                    <button
-                      type="submit"
-                      style={{
-                        padding: '12px 20px',
-                        background: BRAND.accent,
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: 8,
-                        fontWeight: 700,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      إضافة
-                    </button>
-                  </form>
+                {/* محتوى المواد يظهر في قسم طلبات العملاء */}
+                <div style={{ textAlign: 'center', padding: '40px 20px', color: BRAND.muted }}>
+                  <div style={{ fontSize: 48, marginBottom: 12 }}>🧱</div>
+                  <div style={{ fontSize: 16 }}>المواد اللازمة تظهر في قسم طلبات العملاء على اليمين</div>
                 </div>
                 
-                {materials.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '40px 20px', color: BRAND.muted }}>
-                    <div style={{ fontSize: 48, marginBottom: 12 }}>🧱</div>
-                    <div style={{ fontSize: 16 }}>لا توجد مواد مضافة</div>
-                  </div>
-                ) : (
-                  <div style={{ display: 'grid', gap: 12 }}>
-                    {materials.map(m => (
-                      <div
-                        key={m.id}
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          padding: 16,
-                          background: BRAND.light,
-                          borderRadius: 12,
-                          border: '1px solid #e5e7eb'
-                        }}
-                      >
-                        <div>
-                          <div style={{ fontWeight: 700, color: BRAND.dark, marginBottom: 4 }}>{m.name}</div>
-                          <div style={{ fontSize: 13, color: BRAND.muted }}>
-                            الكمية: {m.quantity} {m.unit} | التكلفة: ${m.cost.toLocaleString()}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleRemoveMaterial(m.id)}
-                          style={{
-                            padding: '8px 16px',
-                            background: '#ef4444',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 8,
-                            cursor: 'pointer',
-                            fontWeight: 600
-                          }}
-                        >
-                          حذف
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {/* زر التالي */}
+                <button
+                  type="button"
+                  onClick={() => handleTabChange(3)}
+                  style={{
+                    width: '100%',
+                    background: BRAND.gradient,
+                    color: '#fff',
+                    border: 0,
+                    borderRadius: 12,
+                    padding: '14px 24px',
+                    fontWeight: 700,
+                    fontSize: 16,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 15px rgba(42,157,143,0.3)',
+                    transition: 'all 0.3s ease',
+                    marginTop: 8
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(42,157,143,0.4)';
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(42,157,143,0.3)';
+                  }}
+                >
+                  التالي →
+                </button>
               </div>
             )}
             
@@ -1220,6 +1156,36 @@ export default function AddProjectAndRequests(){
                     ))}
                   </div>
                 )}
+                
+                {/* زر التالي */}
+                <button
+                  type="button"
+                  onClick={() => handleTabChange(4)}
+                  style={{
+                    width: '100%',
+                    background: BRAND.gradient,
+                    color: '#fff',
+                    border: 0,
+                    borderRadius: 12,
+                    padding: '14px 24px',
+                    fontWeight: 700,
+                    fontSize: 16,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 15px rgba(42,157,143,0.3)',
+                    transition: 'all 0.3s ease',
+                    marginTop: 8
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(42,157,143,0.4)';
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(42,157,143,0.3)';
+                  }}
+                >
+                  التالي →
+                </button>
               </div>
             )}
             
@@ -1317,51 +1283,81 @@ export default function AddProjectAndRequests(){
                     ))}
                   </div>
                 )}
+                
+                {/* زر التالي */}
+                <button
+                  type="button"
+                  onClick={() => handleTabChange(5)}
+                  style={{
+                    width: '100%',
+                    background: BRAND.gradient,
+                    color: '#fff',
+                    border: 0,
+                    borderRadius: 12,
+                    padding: '14px 24px',
+                    fontWeight: 700,
+                    fontSize: 16,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 15px rgba(42,157,143,0.3)',
+                    transition: 'all 0.3s ease',
+                    marginTop: 8
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(42,157,143,0.4)';
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(42,157,143,0.3)';
+                  }}
+                >
+                  التالي →
+                </button>
               </div>
             )}
             
             {/* Tab 5: معلومات إضافية */}
             {activeTab === 5 && (
               <div style={{ display: 'grid', gap: 16 }}>
-                <div>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: 8,
-                    color: BRAND.dark,
-                    fontWeight: 600,
-                    fontSize: 14
-                  }}>
-                    الوصف
-                  </label>
-                  <textarea
-                    name="description"
-                    value={projectForm.description}
-                    onChange={handleProjectInput}
-                    placeholder="وصف مختصر عن المشروع"
-                    rows={4}
-                    style={{
-                      width: '100%',
-                      padding: 14,
-                      border: '2px solid #e5e7eb',
-                      borderRadius: 12,
-                      fontSize: 15,
-                      outline: 'none',
-                      transition: 'all 0.3s ease',
-                      background: BRAND.light,
-                      fontFamily: 'inherit',
-                      resize: 'vertical'
-                    }}
-                    onFocus={e => {
-                      e.target.style.borderColor = BRAND.accent;
-                      e.target.style.background = '#fff';
-                    }}
-                    onBlur={e => {
-                      e.target.style.borderColor = '#e5e7eb';
-                      e.target.style.background = BRAND.light;
-                    }}
-                  />
-                </div>
-                
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: 8,
+                color: BRAND.dark,
+                fontWeight: 600,
+                fontSize: 14
+              }}>
+                الوصف
+              </label>
+              <textarea
+                name="description"
+                value={projectForm.description}
+                onChange={handleProjectInput}
+                placeholder="وصف مختصر عن المشروع"
+                rows={4}
+                style={{
+                  width: '100%',
+                  padding: 14,
+                  border: '2px solid #e5e7eb',
+                  borderRadius: 12,
+                  fontSize: 15,
+                  outline: 'none',
+                  transition: 'all 0.3s ease',
+                  background: BRAND.light,
+                  fontFamily: 'inherit',
+                  resize: 'vertical'
+                }}
+                onFocus={e => {
+                  e.target.style.borderColor = BRAND.accent;
+                  e.target.style.background = '#fff';
+                }}
+                onBlur={e => {
+                  e.target.style.borderColor = '#e5e7eb';
+                  e.target.style.background = BRAND.light;
+                }}
+              />
+            </div>
+            
                 <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth > 768 ? '1fr 1fr' : '1fr', gap: 16 }}>
                   <div>
                     <label style={{
@@ -1474,9 +1470,45 @@ export default function AddProjectAndRequests(){
                     }}
                   />
                 </div>
+                
+                {/* زر حفظ المشروع في التبويبة الأخيرة */}
+            <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    saveProject(e);
+                  }}
+              disabled={isSubmitting}
+              style={{
+                    width: '100%',
+                background: BRAND.gradient,
+                color: '#fff',
+                border: 0,
+                borderRadius: 12,
+                padding: '14px 24px',
+                fontWeight: 700,
+                fontSize: 16,
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                boxShadow: '0 4px 15px rgba(42,157,143,0.3)',
+                transition: 'all 0.3s ease',
+                    opacity: isSubmitting ? 0.7 : 1,
+                    marginTop: 8
+              }}
+              onMouseOver={e => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(42,157,143,0.4)';
+                }
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(42,157,143,0.3)';
+              }}
+            >
+              {isSubmitting ? '⏳ جاري الحفظ...' : '✓ حفظ المشروع'}
+            </button>
               </div>
               )}
-              </div>
             </>
           )}
           
