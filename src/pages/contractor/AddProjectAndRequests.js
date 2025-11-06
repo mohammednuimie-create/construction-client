@@ -1428,35 +1428,64 @@ export default function AddProjectAndRequests(){
                   </div>
                 )}
                 
-                {/* زر التالي */}
-                <button
-                  type="button"
-                  onClick={() => handleTabChange(5)}
-                  style={{
-                    width: '100%',
-                    background: BRAND.gradient,
-                    color: '#fff',
-                    border: 0,
-                    borderRadius: 12,
-                    padding: '14px 24px',
-                    fontWeight: 700,
-                    fontSize: 16,
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 15px rgba(42,157,143,0.3)',
-                    transition: 'all 0.3s ease',
-                    marginTop: 8
-                  }}
-                  onMouseOver={e => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(42,157,143,0.4)';
-                  }}
-                  onMouseOut={e => {
-                    e.currentTarget.style.transform = 'none';
-                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(42,157,143,0.3)';
-                  }}
-                >
-                  التالي →
-                </button>
+                {/* أزرار السابق والتالي */}
+                <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange(3)}
+                    style={{
+                      flex: 1,
+                      background: BRAND.light,
+                      color: BRAND.primary,
+                      border: `2px solid ${BRAND.primary}`,
+                      borderRadius: 12,
+                      padding: '14px 24px',
+                      fontWeight: 700,
+                      fontSize: 16,
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.background = BRAND.primary;
+                      e.currentTarget.style.color = '#fff';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.background = BRAND.light;
+                      e.currentTarget.style.color = BRAND.primary;
+                      e.currentTarget.style.transform = 'none';
+                    }}
+                  >
+                    ← السابق
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange(5)}
+                    style={{
+                      flex: 1,
+                      background: BRAND.gradient,
+                      color: '#fff',
+                      border: 0,
+                      borderRadius: 12,
+                      padding: '14px 24px',
+                      fontWeight: 700,
+                      fontSize: 16,
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 15px rgba(42,157,143,0.3)',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(42,157,143,0.4)';
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.transform = 'none';
+                      e.currentTarget.style.boxShadow = '0 4px 15px rgba(42,157,143,0.3)';
+                    }}
+                  >
+                    التالي →
+                  </button>
+                </div>
               </div>
             )}
             
@@ -1617,7 +1646,7 @@ export default function AddProjectAndRequests(){
                 
                 {/* أزرار السابق وحفظ المشروع */}
                 <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-                  <button
+            <button
                     type="button"
                     onClick={() => handleTabChange(4)}
                     style={{
@@ -1651,34 +1680,34 @@ export default function AddProjectAndRequests(){
                       e.preventDefault();
                       saveProject(e);
                     }}
-                    disabled={isSubmitting}
-                    style={{
+              disabled={isSubmitting}
+              style={{
                       flex: 1,
-                      background: BRAND.gradient,
-                      color: '#fff',
-                      border: 0,
-                      borderRadius: 12,
-                      padding: '14px 24px',
-                      fontWeight: 700,
-                      fontSize: 16,
-                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                      boxShadow: '0 4px 15px rgba(42,157,143,0.3)',
-                      transition: 'all 0.3s ease',
-                      opacity: isSubmitting ? 0.7 : 1
-                    }}
-                    onMouseOver={e => {
-                      if (!isSubmitting) {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(42,157,143,0.4)';
-                      }
-                    }}
-                    onMouseOut={e => {
-                      e.currentTarget.style.transform = 'none';
-                      e.currentTarget.style.boxShadow = '0 4px 15px rgba(42,157,143,0.3)';
-                    }}
-                  >
-                    {isSubmitting ? '⏳ جاري الحفظ...' : '✓ حفظ المشروع'}
-                  </button>
+                background: BRAND.gradient,
+                color: '#fff',
+                border: 0,
+                borderRadius: 12,
+                padding: '14px 24px',
+                fontWeight: 700,
+                fontSize: 16,
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                boxShadow: '0 4px 15px rgba(42,157,143,0.3)',
+                transition: 'all 0.3s ease',
+                opacity: isSubmitting ? 0.7 : 1
+              }}
+              onMouseOver={e => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(42,157,143,0.4)';
+                }
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(42,157,143,0.3)';
+              }}
+            >
+              {isSubmitting ? '⏳ جاري الحفظ...' : '✓ حفظ المشروع'}
+            </button>
                 </div>
               </div>
               )}
