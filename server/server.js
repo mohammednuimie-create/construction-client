@@ -1,7 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
+const path = require('path');
+
+// Load .env file explicitly from server directory
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+// Debug: Log environment variables (only first few chars for security)
+console.log('Environment check:');
+console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? process.env.GOOGLE_CLIENT_ID.substring(0, 20) + '...' : 'MISSING');
+console.log('GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? 'SET (' + process.env.GOOGLE_CLIENT_SECRET.length + ' chars)' : 'MISSING');
+console.log('FRONTEND_URL:', process.env.FRONTEND_URL || 'NOT SET');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -39,6 +48,22 @@ app.get('/api/health', (req, res) => {
     status: 'healthy',
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     timestamp: new Date().toISOString()
+  });
+});
+
+// Debug endpoint to check environment variables (only in development)
+app.get('/api/debug/env', (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({ error: 'Not available in production' });
+  }
+  res.json({
+    hasGoogleClientId: !!process.env.GOOGLE_CLIENT_ID,
+    googleClientIdPrefix: process.env.GOOGLE_CLIENT_ID ? process.env.GOOGLE_CLIENT_ID.substring(0, 20) + '...' : 'MISSING',
+    hasGoogleClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+    googleClientSecretPrefix: process.env.GOOGLE_CLIENT_SECRET ? process.env.GOOGLE_CLIENT_SECRET.substring(0, 10) + '...' : 'MISSING',
+    frontendUrl: process.env.FRONTEND_URL || 'NOT SET',
+    nodeEnv: process.env.NODE_ENV || 'NOT SET',
+    port: process.env.PORT || 'NOT SET'
   });
 });
 

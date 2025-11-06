@@ -173,25 +173,38 @@ router.post('/google/callback', async (req, res) => {
       body: new URLSearchParams(tokenRequestParams)
     });
 
-    const tokenData = await tokenResponse.json();
-    
-    console.log('Token response status:', tokenResponse.status);
-    console.log('Token response data:', tokenData);
+    let tokenData;
+    try {
+      const responseText = await tokenResponse.text();
+      console.log('Token response status:', tokenResponse.status);
+      console.log('Token response headers:', Object.fromEntries(tokenResponse.headers.entries()));
+      console.log('Token response text:', responseText);
+      
+      tokenData = JSON.parse(responseText);
+      console.log('Token response data (parsed):', tokenData);
+    } catch (parseError) {
+      console.error('Failed to parse token response:', parseError);
+      return res.status(500).json({ 
+        error: 'Failed to parse Google response', 
+        details: { parseError: parseError.message }
+      });
+    }
     
     if (!tokenResponse.ok) {
       console.error('Failed to exchange code for token:', {
         status: tokenResponse.status,
         error: tokenData.error,
-        error_description: tokenData.error_description
+        error_description: tokenData.error_description,
+        error_uri: tokenData.error_uri
       });
       
       let hint = 'Please check your Google OAuth configuration.';
       if (tokenData.error === 'invalid_grant') {
         hint = 'The authorization code may have expired or already been used. Please try logging in again.';
       } else if (tokenData.error === 'redirect_uri_mismatch') {
-        hint = `Redirect URI mismatch. Expected: ${redirectUri}. Make sure this exact URL is added to Authorized redirect URIs in Google Cloud Console.`;
+        hint = `Redirect URI mismatch. Expected: ${redirectUri}. Make sure this exact URL is added to Authorized redirect URIs in Google Cloud Console. Current redirect URIs must match exactly.`;
       } else if (tokenData.error === 'invalid_client') {
-        hint = 'Invalid client credentials. Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in your .env file.';
+        hint = 'Invalid client credentials. Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in your .env file. Make sure there are no extra spaces or characters.';
       } else if (tokenData.error_description) {
         hint = tokenData.error_description;
       }
@@ -200,7 +213,9 @@ router.post('/google/callback', async (req, res) => {
         error: 'Failed to exchange code for token', 
         details: tokenData,
         hint: hint,
-        redirectUri: redirectUri
+        redirectUri: redirectUri,
+        sentClientId: clientId ? `${clientId.substring(0, 20)}...` : 'MISSING',
+        sentRedirectUri: redirectUri
       });
     }
 
