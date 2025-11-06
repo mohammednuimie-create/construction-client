@@ -11,19 +11,27 @@ router.get('/', async (req, res) => {
     const { client, contractor, status, priority } = req.query;
     const query = {};
     
-    // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط بياناته
-    if (req.user) {
-      if (req.userRole === 'contractor') {
-        // المقاول يرى فقط طلباته
-        query.contractor = req.userId;
-      } else if (req.userRole === 'client') {
-        // العميل يرى فقط طلباته
-        query.client = req.userId;
-      }
+    // عزل البيانات: إلزامي - يجب أن يكون المستخدم مسجل دخوله
+    if (!req.user || !req.userId) {
+      return res.json([]); // إرجاع قائمة فارغة إذا لم يكن مسجل دخوله
     }
     
-    if (client && !req.user) query.client = client;
-    if (contractor && req.userRole !== 'contractor') query.contractor = contractor;
+    // عزل البيانات: المستخدم يرى فقط بياناته
+    if (req.userRole === 'contractor') {
+      // المقاول يرى فقط طلباته
+      query.contractor = mongoose.Types.ObjectId.isValid(req.userId) 
+        ? new mongoose.Types.ObjectId(req.userId) 
+        : req.userId;
+    } else if (req.userRole === 'client') {
+      // العميل يرى فقط طلباته
+      query.client = mongoose.Types.ObjectId.isValid(req.userId) 
+        ? new mongoose.Types.ObjectId(req.userId) 
+        : req.userId;
+    } else {
+      return res.json([]); // دور غير معروف
+    }
+    
+    // لا نسمح بالتصفية اليدوية - البيانات معزولة تلقائياً
     if (status) query.status = status;
     if (priority) query.priority = priority;
     
