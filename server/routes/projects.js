@@ -64,7 +64,29 @@ router.get('/', async (req, res) => {
       query.status = status;
     }
     
-    console.log(`🔍 [Projects GET] Query:`, JSON.stringify(query, null, 2));
+    // تحويل query إلى JSON قابل للقراءة (بدون ObjectId)
+    const queryForLog = {};
+    if (query.$or) {
+      queryForLog.$or = query.$or.map(condition => {
+        const key = Object.keys(condition)[0];
+        const value = condition[key];
+        return { [key]: value.toString() };
+      });
+    } else {
+      Object.keys(query).forEach(key => {
+        queryForLog[key] = query[key]?.toString() || query[key];
+      });
+    }
+    console.log(`🔍 [Projects GET] Query:`, JSON.stringify(queryForLog, null, 2));
+    
+    // جلب جميع المشاريع أولاً للتحقق (للـ debugging فقط)
+    const allProjects = await Project.find({}).select('_id name contractor client').limit(5);
+    console.log(`🔍 [Projects GET] Sample projects in DB (first 5):`);
+    allProjects.forEach((p, idx) => {
+      const contractorId = p.contractor?._id?.toString() || p.contractor?.toString() || 'NONE';
+      const clientId = p.client?._id?.toString() || p.client?.toString() || 'NONE';
+      console.log(`  ${idx + 1}. "${p.name}" - Contractor ID: ${contractorId}, Client ID: ${clientId}`);
+    });
     
     const projects = await Project.find(query)
       .populate('contractor', 'name companyName email')
@@ -77,8 +99,12 @@ router.get('/', async (req, res) => {
     if (projects.length > 0) {
       console.log(`📋 [Projects GET] Projects found:`);
       projects.forEach((p, idx) => {
-        console.log(`  ${idx + 1}. "${p.name}" - Contractor: ${p.contractor?._id || p.contractor || 'NONE'} (${p.contractor?.name || 'N/A'}), Client: ${p.client?._id || p.client || 'NONE'}`);
+        const contractorId = p.contractor?._id?.toString() || p.contractor?.toString() || 'NONE';
+        const clientId = p.client?._id?.toString() || p.client?.toString() || 'NONE';
+        console.log(`  ${idx + 1}. "${p.name}" - Contractor ID: ${contractorId} (${p.contractor?.name || 'N/A'}), Client ID: ${clientId}`);
       });
+    } else {
+      console.log(`⚠️ [Projects GET] No projects found. User ID: ${req.userId}, Role: ${req.userRole}`);
     }
     
     res.json(projects);
