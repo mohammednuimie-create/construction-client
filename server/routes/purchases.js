@@ -11,16 +11,20 @@ router.get('/', async (req, res) => {
     const { supplier, project, status } = req.query;
     const query = {};
     
-    // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط مشترياته
-    if (req.user && req.userRole === 'contractor') {
-      // المقاول يرى فقط المشتريات لمشاريعه
-      const userProjects = await Project.find({ contractor: req.userId }).select('_id');
-      const projectIds = userProjects.map(p => p._id);
-      query.project = { $in: projectIds };
+    // عزل البيانات: إلزامي - يجب أن يكون المستخدم مسجل دخوله
+    if (!req.user || !req.userId || req.userRole !== 'contractor') {
+      return res.json([]); // إرجاع قائمة فارغة إذا لم يكن مقاول مسجل دخوله
     }
     
+    // المقاول يرى فقط المشتريات لمشاريعه
+    const userProjects = await Project.find({ contractor: req.userId }).select('_id');
+    const projectIds = userProjects.map(p => p._id);
+    if (projectIds.length === 0) {
+      return res.json([]); // لا توجد مشاريع = لا توجد مشتريات
+    }
+    query.project = { $in: projectIds };
+    
     if (supplier) query.supplier = supplier;
-    if (project && !req.user) query.project = project;
     if (status) query.status = status;
     
     const purchases = await Purchase.find(query)

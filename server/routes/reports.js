@@ -15,14 +15,15 @@ router.get('/', async (req, res) => {
     const { reportType, project, generatedBy } = req.query;
     const query = {};
     
-    // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط تقاريره
-    if (req.user) {
-      query.generatedBy = req.userId;
+    // عزل البيانات: إلزامي - يجب أن يكون المستخدم مسجل دخوله
+    if (!req.user || !req.userId) {
+      return res.json([]); // إرجاع قائمة فارغة إذا لم يكن مسجل دخوله
     }
     
+    // المستخدم يرى فقط تقاريره
+    query.generatedBy = req.userId;
+    
     if (reportType) query.reportType = reportType;
-    if (project && !req.user) query.project = project;
-    if (generatedBy && !req.user) query.generatedBy = generatedBy;
     
     const reports = await Report.find(query)
       .populate('project', 'name')

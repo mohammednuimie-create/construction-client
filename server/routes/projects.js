@@ -14,41 +14,28 @@ router.get('/', async (req, res) => {
     
     console.log(`📥 [Projects GET] User: ${req.user ? `${req.user.name} (${req.userRole})` : 'NOT AUTHENTICATED'}, ID: ${req.userId || 'N/A'}`);
     
-    // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط بياناته
-    if (req.user && req.userId) {
-      if (req.userRole === 'contractor') {
-        // المقاول يرى فقط مشاريعه
-        query.contractor = req.userId;
-        console.log(`🔒 [Projects GET] Filtering by contractor: ${req.userId}`);
-      } else if (req.userRole === 'client') {
-        // العميل يرى فقط مشاريعه
-        query.client = req.userId;
-        console.log(`🔒 [Projects GET] Filtering by client: ${req.userId}`);
-      }
+    // عزل البيانات: إلزامي - يجب أن يكون المستخدم مسجل دخوله
+    if (!req.user || !req.userId) {
+      console.log(`🔒 [Projects GET] No authentication - returning empty array`);
+      return res.json([]); // إرجاع قائمة فارغة إذا لم يكن مسجل دخوله
+    }
+    
+    // عزل البيانات: المستخدم يرى فقط بياناته
+    if (req.userRole === 'contractor') {
+      // المقاول يرى فقط مشاريعه
+      query.contractor = req.userId;
+      console.log(`🔒 [Projects GET] Filtering by contractor: ${req.userId}`);
+    } else if (req.userRole === 'client') {
+      // العميل يرى فقط مشاريعه
+      query.client = req.userId;
+      console.log(`🔒 [Projects GET] Filtering by client: ${req.userId}`);
     } else {
-      console.log(`⚠️ [Projects GET] No user authentication - returning all projects`);
+      // إذا كان الدور غير معروف، لا نرجع أي بيانات
+      console.log(`⚠️ [Projects GET] Unknown role: ${req.userRole} - returning empty array`);
+      return res.json([]);
     }
     
-    // Filter by client (supports both ObjectId and String for backward compatibility)
-    if (client && !req.user) {
-      // فقط إذا لم يكن المستخدم مسجل دخوله (للإدارة)
-      if (mongoose.Types.ObjectId.isValid(client)) {
-        query.$or = [
-          { client: new mongoose.Types.ObjectId(client) },
-          { client: client.toString() }
-        ];
-      } else {
-        query.$or = [
-          { client: client },
-          { client: { $regex: client, $options: 'i' } }
-        ];
-      }
-    }
-    
-    // Filter by contractor (ObjectId) - فقط إذا لم يكن المستخدم مقاول
-    if (contractor && req.userRole !== 'contractor') {
-      query.contractor = contractor;
-    }
+    // لا نسمح بالتصفية اليدوية إذا كان المستخدم مسجل دخوله - البيانات معزولة تلقائياً
     
     // Filter by status
     if (status) {

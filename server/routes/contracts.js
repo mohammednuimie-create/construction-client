@@ -10,20 +10,23 @@ router.get('/', async (req, res) => {
     const { client, contractor, project, status } = req.query;
     const query = {};
     
-    // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط عقوده
-    if (req.user) {
-      if (req.userRole === 'contractor') {
-        // المقاول يرى فقط عقوده
-        query.contractor = req.userId;
-      } else if (req.userRole === 'client') {
-        // العميل يرى فقط عقوده
-        query.client = req.userId;
-      }
+    // عزل البيانات: إلزامي - يجب أن يكون المستخدم مسجل دخوله
+    if (!req.user || !req.userId) {
+      return res.json([]); // إرجاع قائمة فارغة إذا لم يكن مسجل دخوله
     }
     
-    if (client && !req.user) query.client = client;
-    if (contractor && req.userRole !== 'contractor') query.contractor = contractor;
-    if (project && !req.user) query.project = project;
+    // عزل البيانات: المستخدم يرى فقط عقوده
+    if (req.userRole === 'contractor') {
+      // المقاول يرى فقط عقوده
+      query.contractor = req.userId;
+    } else if (req.userRole === 'client') {
+      // العميل يرى فقط عقوده
+      query.client = req.userId;
+    } else {
+      return res.json([]); // دور غير معروف
+    }
+    
+    // لا نسمح بالتصفية اليدوية - البيانات معزولة تلقائياً
     if (status) query.status = status;
     
     const contracts = await Contract.find(query)

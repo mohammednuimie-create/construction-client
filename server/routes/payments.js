@@ -12,21 +12,25 @@ router.get('/', async (req, res) => {
     const { supplier, project, status, paymentMethod } = req.query;
     const query = {};
     
-    // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط مدفوعاته
-    if (req.user && req.userRole === 'contractor') {
-      // المقاول يرى فقط المدفوعات التي أنشأها أو لمشترياته
-      const userProjects = await Project.find({ contractor: req.userId }).select('_id');
-      const projectIds = userProjects.map(p => p._id);
-      const purchases = await Purchase.find({ project: { $in: projectIds } }).select('_id');
-      const purchaseIds = purchases.map(p => p._id);
-      query.$or = [
-        { createdBy: req.userId },
-        { purchase: { $in: purchaseIds } }
-      ];
+    // عزل البيانات: إلزامي - يجب أن يكون المستخدم مسجل دخوله
+    if (!req.user || !req.userId || req.userRole !== 'contractor') {
+      return res.json([]); // إرجاع قائمة فارغة إذا لم يكن مقاول مسجل دخوله
     }
     
+    // المقاول يرى فقط المدفوعات التي أنشأها أو لمشترياته
+    const userProjects = await Project.find({ contractor: req.userId }).select('_id');
+    const projectIds = userProjects.map(p => p._id);
+    if (projectIds.length === 0) {
+      return res.json([]); // لا توجد مشاريع = لا توجد مدفوعات
+    }
+    const purchases = await Purchase.find({ project: { $in: projectIds } }).select('_id');
+    const purchaseIds = purchases.map(p => p._id);
+    query.$or = [
+      { createdBy: req.userId },
+      { purchase: { $in: purchaseIds } }
+    ];
+    
     if (supplier) query.supplier = supplier;
-    if (project && !req.user) query.project = project;
     if (status) query.status = status;
     if (paymentMethod) query.paymentMethod = paymentMethod;
     

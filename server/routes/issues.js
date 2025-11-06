@@ -11,20 +11,33 @@ router.get('/', async (req, res) => {
     const { project, status, priority } = req.query;
     const query = {};
     
-    // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط مشاكله
-    if (req.user && req.userRole === 'contractor') {
+    // عزل البيانات: إلزامي - يجب أن يكون المستخدم مسجل دخوله
+    if (!req.user || !req.userId) {
+      return res.json([]); // إرجاع قائمة فارغة إذا لم يكن مسجل دخوله
+    }
+    
+    // عزل البيانات: المستخدم يرى فقط مشاكله
+    if (req.userRole === 'contractor') {
       // المقاول يرى فقط المشاكل في مشاريعه
       const userProjects = await Project.find({ contractor: req.userId }).select('_id');
       const projectIds = userProjects.map(p => p._id);
+      if (projectIds.length === 0) {
+        return res.json([]); // لا توجد مشاريع = لا توجد مشاكل
+      }
       query.project = { $in: projectIds };
-    } else if (req.user && req.userRole === 'client') {
+    } else if (req.userRole === 'client') {
       // العميل يرى فقط المشاكل في مشاريعه
       const userProjects = await Project.find({ client: req.userId }).select('_id');
       const projectIds = userProjects.map(p => p._id);
+      if (projectIds.length === 0) {
+        return res.json([]); // لا توجد مشاريع = لا توجد مشاكل
+      }
       query.project = { $in: projectIds };
+    } else {
+      return res.json([]); // دور غير معروف
     }
     
-    if (project && !req.user) query.project = project;
+    // لا نسمح بالتصفية اليدوية - البيانات معزولة تلقائياً
     if (status) query.status = status;
     if (priority) query.priority = priority;
     
