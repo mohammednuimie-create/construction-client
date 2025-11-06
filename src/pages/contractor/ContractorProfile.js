@@ -31,21 +31,13 @@ export default function ContractorProfile() {
       setIsLoading(true);
       try {
         const user = getUser();
-        console.log('🔍 [Profile] Current user from localStorage:', user);
-        
-        if (!user || (!user.id && !user._id)) {
-          console.error('❌ [Profile] No user ID found:', user);
+        if (!user || !user.id) {
           notifications.error('خطأ', 'يرجى تسجيل الدخول أولاً');
           setIsLoading(false);
           return;
         }
 
-        const userId = user.id || user._id;
-        console.log('📤 [Profile] Fetching user data for ID:', userId);
-        
-        const userData = await usersAPI.getById(userId);
-        console.log('✅ [Profile] User data received:', userData);
-        
+        const userData = await usersAPI.getById(user.id || user._id);
         const profileData = {
           name: userData.name || '',
           companyName: userData.companyName || userData.company || '',
@@ -56,18 +48,11 @@ export default function ContractorProfile() {
           description: userData.description || userData.bio || ''
         };
         
-        console.log('📝 [Profile] Profile data prepared:', profileData);
         setForm(profileData);
         setOriginalForm(profileData);
       } catch (err) {
-        console.error('❌ [Profile] Error loading profile:', err);
-        console.error('❌ [Profile] Error details:', {
-          message: err.message,
-          stack: err.stack,
-          name: err.name
-        });
-        const errorMessage = err.message || 'فشل تحميل بيانات الملف الشخصي';
-        notifications.error('خطأ', errorMessage);
+        console.error('Error loading profile:', err);
+        notifications.error('خطأ', 'فشل تحميل بيانات الملف الشخصي');
       } finally {
         setIsLoading(false);
       }
@@ -98,13 +83,7 @@ export default function ContractorProfile() {
         description: form.description
       };
 
-      const userId = user.id || user._id;
-      if (!userId) {
-        notifications.error('خطأ', 'معرف المستخدم غير موجود');
-        setIsSaving(false);
-        return;
-      }
-      await usersAPI.update(userId, updateData);
+      await usersAPI.update(user.id || user._id, updateData);
       
       // Update local storage
       const updatedUser = { ...user, ...updateData };

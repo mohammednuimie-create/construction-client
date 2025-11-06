@@ -52,7 +52,7 @@ export default function ClientRequests() {
       setError(null);
       try {
         const user = getUser();
-        if (!user || (!user.id && !user._id)) {
+        if (!user || !user.id) {
           setError('يرجى تسجيل الدخول أولاً');
           setIsLoading(false);
           return;

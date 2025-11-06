@@ -32,6 +32,9 @@ import TestimonialsPage from "./pages/public/TestimonialsPage";
 import FAQPage from "./pages/public/FAQPage";
 import HowItWorksPage from "./pages/public/HowItWorksPage";
 
+// Auth Pages
+import ResetPassword from "./pages/auth/ResetPassword";
+
 import logo from "./company-logo.jpeg";
 import splashBg from "./55.jpeg";
 
@@ -101,6 +104,73 @@ function ShowcasePage() {
 }
 
 function ProfilePage() { return <div style={{padding:'20px'}}><h2>صفحتك الشخصية</h2><p>سيتم بناء هذه الصفحة لاحقًا.</p></div>; }
+
+function GoogleCallbackHandler() {
+  const navigate = useNavigate();
+  const [searchParams] = React.useState(() => new URLSearchParams(window.location.search));
+  
+  React.useEffect(() => {
+    const code = searchParams.get('code');
+    const error = searchParams.get('error');
+    const role = localStorage.getItem('selectedRole') || 'client';
+    
+    if (error) {
+      alert(`❌ فشل تسجيل الدخول عبر Google: ${error}`);
+      navigate('/login');
+      return;
+    }
+    
+    if (code) {
+      // Exchange code for token
+      const handleGoogleCallback = async () => {
+        try {
+          const { authAPI, setToken, setUser } = await import('./utils/api');
+          const response = await authAPI.googleCallback(code, role === 'مقاول' ? 'contractor' : 'client');
+          
+          setToken(response.token);
+          setUser(response.user);
+          
+          // Navigate based on role
+          if (response.user.role === 'contractor') {
+            navigate('/contractor');
+          } else {
+            navigate('/client/profile');
+          }
+        } catch (error) {
+          console.error('Google callback error:', error);
+          alert(`❌ ${error.message || 'فشل تسجيل الدخول عبر Google'}`);
+          navigate('/login');
+        }
+      };
+      
+      handleGoogleCallback();
+    } else {
+      navigate('/login');
+    }
+  }, [navigate, searchParams]);
+  
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #1e3a5f 0%, #2a9d8f 50%, #264653 100%)'
+    }}>
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.95)',
+        borderRadius: 24,
+        padding: 48,
+        textAlign: 'center',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+      }}>
+        <div style={{ fontSize: 48, marginBottom: 24 }}>⏳</div>
+        <h2 style={{ color: '#1e3a5f', marginBottom: 16 }}>جاري تسجيل الدخول...</h2>
+        <p style={{ color: '#64748b' }}>يرجى الانتظار</p>
+      </div>
+    </div>
+  );
+}
 
 function AuthRouter() {
   const [showSplash, setShowSplash] = useState(true);
@@ -230,6 +300,10 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         {/* Login */}
         <Route path="/login" element={<AuthRouter />} />
+        {/* Reset Password */}
+        <Route path="/reset-password" element={<ResetPassword />} />
+        {/* Google OAuth Callback */}
+        <Route path="/auth/google/callback" element={<GoogleCallbackHandler />} />
         {/* Public Pages */}
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/testimonials" element={<TestimonialsPage />} />

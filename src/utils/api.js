@@ -61,6 +61,10 @@ const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
 export const authAPI = {
   register: (userData) => callApi('/auth/register', 'POST', userData, false),
   login: (email, password) => callApi('/auth/login', 'POST', { email, password }, false),
+  getGoogleAuthUrl: () => callApi('/auth/google/url', 'GET', null, false),
+  googleCallback: (code, role) => callApi('/auth/google/callback', 'POST', { code, role }, false),
+  forgotPassword: (email) => callApi('/auth/forgot-password', 'POST', { email }, false),
+  resetPassword: (token, email, password) => callApi('/auth/reset-password', 'POST', { token, email, password }, false),
 };
 
 // Projects API
