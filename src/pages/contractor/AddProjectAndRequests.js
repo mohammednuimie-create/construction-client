@@ -673,7 +673,7 @@ export default function AddProjectAndRequests(){
                   border: `2px solid ${BRAND.accent}`
                 }}>
                   <h4 style={{ margin: '0 0 12px 0', color: BRAND.primary, fontSize: 16 }}>إضافة مادة جديدة</h4>
-                  <form onSubmit={handleAddMaterial} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: 12 }}>
+                  <form onSubmit={handleAddMaterial} style={{ display: 'grid', gridTemplateColumns: window.innerWidth > 768 ? '2fr 1fr 1fr 1fr auto' : '1fr', gap: 12 }}>
                     <input
                       type="text"
                       placeholder="اسم المادة"
@@ -808,7 +808,7 @@ export default function AddProjectAndRequests(){
                 }}>
                   <h4 style={{ margin: '0 0 12px 0', color: BRAND.primary, fontSize: 16 }}>إضافة مهندس</h4>
                   <form onSubmit={handleAddEngineer} style={{ display: 'grid', gap: 12 }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth > 768 ? '2fr 1fr' : '1fr', gap: 12 }}>
                       <input
                         type="text"
                         placeholder="اسم المهندس *"
@@ -839,7 +839,7 @@ export default function AddProjectAndRequests(){
                         <option value="كهرباء">كهرباء</option>
                       </select>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth > 768 ? '1fr 1fr 1fr' : '1fr', gap: 12 }}>
                       <input
                         type="number"
                         placeholder="الراتب *"
@@ -1182,7 +1182,7 @@ export default function AddProjectAndRequests(){
                   />
                 </div>
                 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth > 768 ? '1fr 1fr' : '1fr', gap: 16 }}>
                   <div>
                     <label style={{
                       display: 'block',
