@@ -20,6 +20,8 @@ export default function LandingPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const statsRef = useRef(null);
   const [animatedStats, setAnimatedStats] = useState([0, 0, 0, 0]);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
   const stats = [
     { value: 250, suffix: '+', label: 'مشروع منجز', icon: '🏗️' },
@@ -29,7 +31,10 @@ export default function LandingPage() {
   ];
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+      setShowBackToTop(window.scrollY > 300);
+    };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -118,6 +123,87 @@ export default function LandingPage() {
       category: 'مراكز تجارية',
       image: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1400&h=900&fit=crop&q=85',
       stats: { area: '12000 م²', floors: '5 طابق', duration: '30 شهر' }
+    },
+  ];
+
+  const testimonials = [
+    {
+      name: 'أحمد محمد',
+      role: 'مدير مشروع',
+      company: 'شركة البناء الحديث',
+      image: 'https://i.pravatar.cc/150?img=12',
+      text: 'نظام ممتاز ساعدنا في إدارة مشاريعنا بكفاءة عالية. التوصيات والمراقبة أصبحت أسهل بكثير.',
+      rating: 5
+    },
+    {
+      name: 'فاطمة علي',
+      role: 'مالكة مشروع سكني',
+      company: 'مجمع السكن الفاخر',
+      image: 'https://i.pravatar.cc/150?img=47',
+      text: 'خدمة احترافية ومتابعة دقيقة. فريق العمل متجاوب جداً وساعدنا في إنجاز المشروع في الوقت المحدد.',
+      rating: 5
+    },
+    {
+      name: 'خالد حسن',
+      role: 'مستثمر',
+      company: 'شركة الاستثمار العقاري',
+      image: 'https://i.pravatar.cc/150?img=33',
+      text: 'أفضل نظام إدارة مقاولات استخدمته. الشفافية والدقة في المتابعة ممتازة.',
+      rating: 5
+    },
+  ];
+
+  const howItWorks = [
+    {
+      step: 1,
+      title: 'سجّل حسابك',
+      desc: 'أنشئ حسابك كعميل أو مقاول في دقائق',
+      icon: '👤'
+    },
+    {
+      step: 2,
+      title: 'أضف مشروعك',
+      desc: 'أضف تفاصيل مشروعك وحدد المتطلبات',
+      icon: '📝'
+    },
+    {
+      step: 3,
+      title: 'راقب التقدم',
+      desc: 'تابع تقدم مشروعك في الوقت الفعلي',
+      icon: '📊'
+    },
+    {
+      step: 4,
+      title: 'احصل على النتائج',
+      desc: 'استلم مشروعك المكتمل بجودة عالية',
+      icon: '✅'
+    },
+  ];
+
+  const faqs = [
+    {
+      question: 'كيف يمكنني التسجيل في النظام؟',
+      answer: 'يمكنك التسجيل بسهولة من خلال الضغط على زر "إنشاء حساب" في الصفحة الرئيسية واختيار نوع الحساب (عميل أو مقاول) ثم ملء البيانات المطلوبة.'
+    },
+    {
+      question: 'ما هي أنواع المشاريع التي يمكن إدارتها؟',
+      answer: 'يمكن إدارة جميع أنواع المشاريع الإنشائية مثل المباني السكنية والإدارية، المراكز التجارية، البنية التحتية، وغيرها من المشاريع.'
+    },
+    {
+      question: 'هل النظام مجاني؟',
+      answer: 'نعم، النظام مجاني للاستخدام. يمكنك إنشاء حساب والبدء في إدارة مشاريعك فوراً دون أي رسوم.'
+    },
+    {
+      question: 'كيف يمكنني التواصل مع الدعم الفني؟',
+      answer: 'يمكنك التواصل معنا من خلال نموذج التواصل في الصفحة الرئيسية، أو عبر البريد الإلكتروني. فريقنا متاح لمساعدتك في أي وقت.'
+    },
+    {
+      question: 'هل يمكن للمقاولين إدارة عدة مشاريع في نفس الوقت؟',
+      answer: 'نعم، يمكن للمقاولين إدارة عدد غير محدود من المشاريع في نفس الوقت. النظام يوفر لوحة تحكم شاملة لمتابعة جميع المشاريع.'
+    },
+    {
+      question: 'كيف يتم ضمان أمان البيانات؟',
+      answer: 'نستخدم أحدث تقنيات الأمان والتشفير لحماية بياناتك. جميع المعلومات محمية ومشفرة وفق أعلى المعايير الأمنية.'
     },
   ];
 
@@ -693,6 +779,121 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section style={{
+        background: BRAND.light,
+        padding: '100px 32px',
+        position: 'relative'
+      }}>
+        <div style={{
+          maxWidth: 1400,
+          margin: '0 auto',
+          textAlign: 'center',
+          marginBottom: 60
+        }}>
+          <h2 style={{
+            fontSize: 48,
+            fontWeight: 900,
+            color: BRAND.primary,
+            marginBottom: 16,
+            letterSpacing: '-1px'
+          }}>
+            كيف يعمل النظام؟
+          </h2>
+          <p style={{
+            fontSize: 20,
+            color: BRAND.muted,
+            maxWidth: 700,
+            margin: '0 auto',
+            lineHeight: 1.8
+          }}>
+            خطوات بسيطة لبدء إدارة مشاريعك بكفاءة
+          </p>
+        </div>
+
+        <div style={{
+          maxWidth: 1400,
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
+          gap: isMobile ? 32 : 24,
+          padding: isMobile ? '0 20px' : '0'
+        }}>
+          {howItWorks.map((item, index) => (
+            <div
+              key={index}
+              style={{
+                background: '#fff',
+                borderRadius: 24,
+                padding: 40,
+                textAlign: 'center',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                border: '2px solid transparent',
+                transition: 'all 0.4s ease',
+                position: 'relative'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.borderColor = BRAND.accent;
+                e.currentTarget.style.transform = 'translateY(-10px)';
+                e.currentTarget.style.boxShadow = `0 12px 40px ${BRAND.accent}30`;
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.borderColor = 'transparent';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
+              }}
+            >
+              <div style={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                background: BRAND.gradientLight,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 36,
+                margin: '0 auto 24px',
+                boxShadow: `0 8px 25px ${BRAND.accent}40`
+              }}>
+                {item.icon}
+              </div>
+              <div style={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                background: BRAND.accent,
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 900,
+                fontSize: 18,
+                position: 'absolute',
+                top: 20,
+                right: 20
+              }}>
+                {item.step}
+              </div>
+              <h3 style={{
+                fontSize: 22,
+                fontWeight: 800,
+                color: BRAND.primary,
+                marginBottom: 12
+              }}>
+                {item.title}
+              </h3>
+              <p style={{
+                fontSize: 16,
+                color: BRAND.muted,
+                lineHeight: 1.7
+              }}>
+                {item.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Projects Section */}
       <section id="section-3" style={{
         background: BRAND.dark,
@@ -817,6 +1018,124 @@ export default function LandingPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section style={{
+        background: '#fff',
+        padding: '100px 32px',
+        position: 'relative'
+      }}>
+        <div style={{
+          maxWidth: 1400,
+          margin: '0 auto',
+          textAlign: 'center',
+          marginBottom: 60
+        }}>
+          <h2 style={{
+            fontSize: 48,
+            fontWeight: 900,
+            color: BRAND.primary,
+            marginBottom: 16,
+            letterSpacing: '-1px'
+          }}>
+            ماذا يقول عملاؤنا؟
+          </h2>
+          <p style={{
+            fontSize: 20,
+            color: BRAND.muted,
+            maxWidth: 700,
+            margin: '0 auto',
+            lineHeight: 1.8
+          }}>
+            آراء حقيقية من عملائنا المميزين
+          </p>
+        </div>
+
+        <div style={{
+          maxWidth: 1400,
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+          gap: isMobile ? 24 : 32,
+          padding: isMobile ? '0 20px' : '0'
+        }}>
+          {testimonials.map((testimonial, index) => (
+            <div
+              key={index}
+              style={{
+                background: BRAND.light,
+                borderRadius: 24,
+                padding: 40,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                border: '1px solid rgba(0,0,0,0.05)',
+                transition: 'all 0.4s ease',
+                position: 'relative'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-8px)';
+                e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.15)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
+              }}
+            >
+              <div style={{
+                display: 'flex',
+                gap: 8,
+                marginBottom: 16
+              }}>
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <span key={i} style={{ fontSize: 18, color: '#fbbf24' }}>⭐</span>
+                ))}
+              </div>
+              <p style={{
+                fontSize: 16,
+                color: BRAND.muted,
+                lineHeight: 1.8,
+                marginBottom: 24,
+                fontStyle: 'italic'
+              }}>
+                "{testimonial.text}"
+              </p>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 16,
+                paddingTop: 24,
+                borderTop: '1px solid rgba(0,0,0,0.1)'
+              }}>
+                <img
+                  src={testimonial.image}
+                  alt={testimonial.name}
+                  style={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: '50%',
+                    objectFit: 'cover'
+                  }}
+                />
+                <div>
+                  <div style={{
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: BRAND.primary,
+                    marginBottom: 4
+                  }}>
+                    {testimonial.name}
+                  </div>
+                  <div style={{
+                    fontSize: 14,
+                    color: BRAND.muted
+                  }}>
+                    {testimonial.role} - {testimonial.company}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1031,6 +1350,110 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section style={{
+        background: BRAND.light,
+        padding: '100px 32px'
+      }}>
+        <div style={{
+          maxWidth: 900,
+          margin: '0 auto',
+          textAlign: 'center',
+          marginBottom: 60
+        }}>
+          <h2 style={{
+            fontSize: 48,
+            fontWeight: 900,
+            color: BRAND.primary,
+            marginBottom: 16,
+            letterSpacing: '-1px'
+          }}>
+            الأسئلة الشائعة
+          </h2>
+          <p style={{
+            fontSize: 20,
+            color: BRAND.muted,
+            maxWidth: 700,
+            margin: '0 auto',
+            lineHeight: 1.8
+          }}>
+            إجابات على أكثر الأسئلة شيوعاً
+          </p>
+        </div>
+
+        <div style={{
+          maxWidth: 900,
+          margin: '0 auto',
+          display: 'grid',
+          gap: 16
+        }}>
+          {faqs.map((faq, index) => (
+            <div
+              key={index}
+              style={{
+                background: '#fff',
+                borderRadius: 16,
+                overflow: 'hidden',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                border: '1px solid rgba(0,0,0,0.05)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.05)';
+              }}
+            >
+              <button
+                onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                style={{
+                  width: '100%',
+                  padding: '24px 32px',
+                  background: 'transparent',
+                  border: 0,
+                  textAlign: 'right',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 16
+                }}
+              >
+                <h3 style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: BRAND.primary,
+                  margin: 0,
+                  flex: 1
+                }}>
+                  {faq.question}
+                </h3>
+                <span style={{
+                  fontSize: 24,
+                  color: BRAND.accent,
+                  transition: 'transform 0.3s ease',
+                  transform: openFaqIndex === index ? 'rotate(180deg)' : 'rotate(0deg)'
+                }}>
+                  ▼
+                </span>
+              </button>
+              {openFaqIndex === index && (
+                <div style={{
+                  padding: '0 32px 24px',
+                  fontSize: 16,
+                  color: BRAND.muted,
+                  lineHeight: 1.8,
+                  animation: 'fadeInUp 0.3s ease'
+                }}>
+                  {faq.answer}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Footer */}
       <footer style={{
         background: BRAND.dark,
@@ -1073,6 +1496,133 @@ export default function LandingPage() {
           }}>
             بناء المستقبل بكل ثقة واحترافية
           </p>
+          
+          {/* Social Media Links */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 16,
+            marginBottom: 32
+          }}>
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 24,
+                color: '#fff',
+                textDecoration: 'none',
+                transition: 'all 0.3s ease',
+                border: '1px solid rgba(255,255,255,0.2)'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              📘
+            </a>
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 24,
+                color: '#fff',
+                textDecoration: 'none',
+                transition: 'all 0.3s ease',
+                border: '1px solid rgba(255,255,255,0.2)'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              📷
+            </a>
+            <a
+              href="https://linkedin.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 24,
+                color: '#fff',
+                textDecoration: 'none',
+                transition: 'all 0.3s ease',
+                border: '1px solid rgba(255,255,255,0.2)'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              💼
+            </a>
+            <a
+              href="https://twitter.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 24,
+                color: '#fff',
+                textDecoration: 'none',
+                transition: 'all 0.3s ease',
+                border: '1px solid rgba(255,255,255,0.2)'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              🐦
+            </a>
+          </div>
+
           <div style={{
             paddingTop: 32,
             borderTop: '1px solid rgba(255,255,255,0.1)',
@@ -1086,6 +1636,43 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          style={{
+            position: 'fixed',
+            bottom: 30,
+            left: 30,
+            width: 60,
+            height: 60,
+            borderRadius: '50%',
+            background: BRAND.gradientLight,
+            color: '#fff',
+            border: 0,
+            fontSize: 24,
+            cursor: 'pointer',
+            boxShadow: '0 8px 25px rgba(42, 157, 143, 0.4)',
+            zIndex: 999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s ease',
+            animation: 'fadeInUp 0.3s ease'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'translateY(-5px)';
+            e.currentTarget.style.boxShadow = '0 12px 35px rgba(42, 157, 143, 0.5)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 8px 25px rgba(42, 157, 143, 0.4)';
+          }}
+        >
+          ↑
+        </button>
+      )}
     </div>
   );
 }
