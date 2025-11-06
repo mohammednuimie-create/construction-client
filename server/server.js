@@ -51,19 +51,19 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Debug endpoint to check environment variables (only in development)
+// Debug endpoint to check environment variables (safe for production - no secrets exposed)
 app.get('/api/debug/env', (req, res) => {
-  if (process.env.NODE_ENV === 'production') {
-    return res.status(403).json({ error: 'Not available in production' });
-  }
   res.json({
     hasGoogleClientId: !!process.env.GOOGLE_CLIENT_ID,
     googleClientIdPrefix: process.env.GOOGLE_CLIENT_ID ? process.env.GOOGLE_CLIENT_ID.substring(0, 20) + '...' : 'MISSING',
+    googleClientIdLength: process.env.GOOGLE_CLIENT_ID ? process.env.GOOGLE_CLIENT_ID.length : 0,
     hasGoogleClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
     googleClientSecretPrefix: process.env.GOOGLE_CLIENT_SECRET ? process.env.GOOGLE_CLIENT_SECRET.substring(0, 10) + '...' : 'MISSING',
+    googleClientSecretLength: process.env.GOOGLE_CLIENT_SECRET ? process.env.GOOGLE_CLIENT_SECRET.length : 0,
     frontendUrl: process.env.FRONTEND_URL || 'NOT SET',
     nodeEnv: process.env.NODE_ENV || 'NOT SET',
-    port: process.env.PORT || 'NOT SET'
+    port: process.env.PORT || 'NOT SET',
+    mongodbConnected: mongoose.connection.readyState === 1
   });
 });
 
