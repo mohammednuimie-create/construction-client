@@ -138,7 +138,23 @@ function GoogleCallbackHandler() {
           }
         } catch (error) {
           console.error('Google callback error:', error);
-          alert(`❌ ${error.message || 'فشل تسجيل الدخول عبر Google'}`);
+          let errorMessage = error.message || 'فشل تسجيل الدخول عبر Google';
+          
+          // Show more detailed error if available
+          if (error.details) {
+            console.error('Error details:', error.details);
+            if (error.details.error === 'redirect_uri_mismatch') {
+              errorMessage = 'خطأ في إعدادات Google OAuth: Redirect URI غير متطابق. يرجى التحقق من الإعدادات.';
+            } else if (error.details.error === 'invalid_client') {
+              errorMessage = 'خطأ في إعدادات Google OAuth: Client ID أو Client Secret غير صحيح.';
+            } else if (error.details.error === 'invalid_grant') {
+              errorMessage = 'انتهت صلاحية رمز المصادقة. يرجى المحاولة مرة أخرى.';
+            } else if (error.details.error_description) {
+              errorMessage = `خطأ: ${error.details.error_description}`;
+            }
+          }
+          
+          alert(`❌ ${errorMessage}`);
           navigate('/login');
         }
       };

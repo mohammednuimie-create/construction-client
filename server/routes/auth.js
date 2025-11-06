@@ -129,6 +129,26 @@ router.post('/google/callback', async (req, res) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const redirectUri = `${frontendUrl}/auth/google/callback`;
 
+    // Check if credentials are configured
+    if (!clientId || !clientSecret) {
+      console.error('Google OAuth credentials not configured');
+      return res.status(500).json({ 
+        error: 'Google OAuth not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.',
+        details: {
+          hasClientId: !!clientId,
+          hasClientSecret: !!clientSecret,
+          frontendUrl: frontendUrl,
+          redirectUri: redirectUri
+        }
+      });
+    }
+
+    console.log('Exchanging code for token:', {
+      redirectUri: redirectUri,
+      hasCode: !!code,
+      codeLength: code?.length
+    });
+
     // Exchange code for access token
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
@@ -145,7 +165,18 @@ router.post('/google/callback', async (req, res) => {
     const tokenData = await tokenResponse.json();
     
     if (!tokenResponse.ok) {
-      return res.status(400).json({ error: 'Failed to exchange code for token', details: tokenData });
+      console.error('Failed to exchange code for token:', tokenData);
+      return res.status(400).json({ 
+        error: 'Failed to exchange code for token', 
+        details: tokenData,
+        hint: tokenData.error === 'invalid_grant' 
+          ? 'The authorization code may have expired or already been used. Please try logging in again.'
+          : tokenData.error === 'redirect_uri_mismatch'
+          ? `Redirect URI mismatch. Make sure ${redirectUri} is added to Authorized redirect URIs in Google Cloud Console.`
+          : tokenData.error === 'invalid_client'
+          ? 'Invalid client credentials. Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.'
+          : 'Please check your Google OAuth configuration.'
+      });
     }
 
     // Get user info from Google

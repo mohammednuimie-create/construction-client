@@ -48,7 +48,15 @@ const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
     const responseData = await response.json();
 
     if (!response.ok) {
-      throw new Error(responseData.message || responseData.error || 'Something went wrong');
+      const apiError = new Error(responseData.message || responseData.error || 'Something went wrong');
+      // Preserve error details for better error handling
+      if (responseData.details) {
+        apiError.details = responseData.details;
+      }
+      if (responseData.hint) {
+        apiError.hint = responseData.hint;
+      }
+      throw apiError;
     }
     return responseData;
   } catch (error) {
