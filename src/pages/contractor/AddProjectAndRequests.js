@@ -186,9 +186,10 @@ export default function AddProjectAndRequests(){
       notifications.warning('تحذير', 'يرجى إدخال اسم الفريق');
       return;
     }
-    setCrews([...crews, newCrew.trim()]);
+    const crewName = newCrew.trim();
+    setCrews([...crews, crewName]);
     setNewCrew('');
-    notifications.success('نجح', `تم إضافة فريق ${newCrew.trim()}`);
+    notifications.success('نجح', `تم إضافة فريق ${crewName}`);
   };
   
   const handleRemoveCrew = (index) => {
