@@ -26,6 +26,12 @@ import ClientProjects from "./pages/client/ClientProjects";
 import ClientAddProject from "./pages/client/ClientAddProject";
 import ClientRequests from "./pages/client/ClientRequests";
 
+// Public Pages
+import ProjectsPage from "./pages/public/ProjectsPage";
+import TestimonialsPage from "./pages/public/TestimonialsPage";
+import FAQPage from "./pages/public/FAQPage";
+import HowItWorksPage from "./pages/public/HowItWorksPage";
+
 import logo from "./company-logo.jpeg";
 import splashBg from "./55.jpeg";
 
@@ -111,62 +117,161 @@ function AuthRouter() {
     <SplashScreen logo={logo} splashBg={splashBg} onFinish={() => setShowSplash(false)} />
   ) : (
     <div style={{
-      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%)',
       minHeight: '100vh',
       display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '20px',
       position: 'relative',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      background: '#fff'
     }}>
-      {/* Decorative background elements */}
+      {/* Left Side - Visual Content */}
+      {!isMobile && (
+        <div style={{
+          width: '50%',
+          background: 'linear-gradient(135deg, #1e3a5f 0%, #2a9d8f 50%, #264653 100%)',
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '60px',
+          overflow: 'hidden'
+        }}>
+          {/* Background Effects */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'radial-gradient(circle at 20% 50%, rgba(42, 157, 143, 0.3) 0%, transparent 50%)',
+            pointerEvents: 'none'
+          }} />
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'radial-gradient(circle at 80% 80%, rgba(30, 58, 95, 0.2) 0%, transparent 50%)',
+            pointerEvents: 'none'
+          }} />
+          
+          {/* Content */}
+          <div style={{
+            position: 'relative',
+            zIndex: 1,
+            textAlign: 'center',
+            color: '#fff',
+            maxWidth: 500
+          }}>
+            <div style={{
+              width: 100,
+              height: 100,
+              borderRadius: 24,
+              background: 'rgba(255, 255, 255, 0.15)',
+              backdropFilter: 'blur(10px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 50,
+              margin: '0 auto 32px',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              animation: 'float 6s ease-in-out infinite'
+            }}>
+              🏗️
+            </div>
+            <h1 style={{
+              fontSize: 42,
+              fontWeight: 900,
+              marginBottom: 20,
+              letterSpacing: '-1px',
+              lineHeight: 1.2
+            }}>
+              المستقبل لإدارة المقاولات
+            </h1>
+            <p style={{
+              fontSize: 18,
+              lineHeight: 1.8,
+              opacity: 0.95,
+              marginBottom: 40
+            }}>
+              نظام متكامل لإدارة مشاريعك بكفاءة واحترافية
+            </p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 20,
+              marginTop: 40
+            }}>
+              {[
+                { icon: '⚡', text: 'سرعة التنفيذ' },
+                { icon: '🔒', text: 'أمان عالي' },
+                { icon: '📊', text: 'تقارير شاملة' },
+                { icon: '💎', text: 'جودة عالية' }
+              ].map((item, idx) => (
+                <div key={idx} style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: 16,
+                  padding: 20,
+                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                }}>
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>{item.icon}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>{item.text}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Right Side - Login Form */}
       <div style={{
-        position: 'absolute',
-        top: '-50%',
-        right: '-20%',
-        width: '600px',
-        height: '600px',
-        background: 'radial-gradient(circle, rgba(42,157,143,0.08) 0%, transparent 70%)',
-        borderRadius: '50%',
-        zIndex: 0
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '-30%',
-        left: '-10%',
-        width: '500px',
-        height: '500px',
-        background: 'radial-gradient(circle, rgba(30,58,95,0.06) 0%, transparent 70%)',
-        borderRadius: '50%',
-        zIndex: 0
-      }} />
-      
-      <div style={{
-        background: 'rgba(255,255,255,0.95)',
-        backdropFilter: 'blur(10px)',
-        borderRadius: 24,
-        boxShadow: '0 20px 60px rgba(30,58,95,0.15)',
-        padding: isMobile ? '32px 24px' : '48px 40px',
-        width: '98%',
-        maxWidth: 450,
-        position: 'relative',
-        zIndex: 1,
-        border: '1px solid rgba(255,255,255,0.8)'
+        width: isMobile ? '100%' : '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: isMobile ? '40px 20px' : '60px',
+        background: '#f8fafc',
+        position: 'relative'
       }}>
-        <RoleLogin 
-          onLogin={(role, email, password)=>{ 
-            if(role==="مقاول") {
-              navigate("/contractor");
-            } else if(role==="عميل") {
-              navigate("/client/profile");
-            } else {
-              alert(`تم تسجيل الدخول (${role})!`);
-            }
-          }} 
-          onGuest={()=>navigate("/showcase")} 
-        />
+        {/* Decorative elements */}
+        <div style={{
+          position: 'absolute',
+          top: '-100px',
+          left: '-100px',
+          width: '400px',
+          height: '400px',
+          background: 'radial-gradient(circle, rgba(42,157,143,0.05) 0%, transparent 70%)',
+          borderRadius: '50%',
+          zIndex: 0
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-50px',
+          right: '-50px',
+          width: '300px',
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(30,58,95,0.05) 0%, transparent 70%)',
+          borderRadius: '50%',
+          zIndex: 0
+        }} />
+        
+        <div style={{
+          width: '100%',
+          maxWidth: 480,
+          position: 'relative',
+          zIndex: 1
+        }}>
+          <RoleLogin 
+            onLogin={(role, email, password)=>{ 
+              if(role==="مقاول") {
+                navigate("/contractor");
+              } else if(role==="عميل") {
+                navigate("/client/profile");
+              } else {
+                alert(`تم تسجيل الدخول (${role})!`);
+              }
+            }} 
+            onGuest={()=>navigate("/showcase")} 
+          />
+        </div>
       </div>
+
+      {/* Footer */}
       <div style={{
         position: 'fixed',
         bottom: 16,
@@ -175,10 +280,18 @@ function AuthRouter() {
         color: '#64748b',
         fontSize: 13,
         fontWeight: 500,
-        zIndex: 1
+        zIndex: 10,
+        pointerEvents: 'none'
       }}>
         كل الحقوق محفوظة © {new Date().getFullYear()} – إدارة المقاولات
       </div>
+      
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -211,6 +324,11 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         {/* Login */}
         <Route path="/login" element={<AuthRouter />} />
+        {/* Public Pages */}
+        <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/testimonials" element={<TestimonialsPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/how-it-works" element={<HowItWorksPage />} />
         {/* App layout */}
         <Route element={<MainLayout />}>
           {/* Public/Showcase */}

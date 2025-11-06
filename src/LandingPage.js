@@ -21,7 +21,6 @@ export default function LandingPage() {
   const statsRef = useRef(null);
   const [animatedStats, setAnimatedStats] = useState([0, 0, 0, 0]);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
   const stats = [
     { value: 250, suffix: '+', label: 'مشروع منجز', icon: '🏗️' },
@@ -126,87 +125,6 @@ export default function LandingPage() {
       category: 'مراكز تجارية',
       image: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1400&h=900&fit=crop&q=85',
       stats: { area: '12000 م²', floors: '5 طابق', duration: '30 شهر' }
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: 'أحمد محمد',
-      role: 'مدير مشروع',
-      company: 'شركة البناء الحديث',
-      image: 'https://i.pravatar.cc/150?img=12',
-      text: 'نظام ممتاز ساعدنا في إدارة مشاريعنا بكفاءة عالية. التوصيات والمراقبة أصبحت أسهل بكثير.',
-      rating: 5
-    },
-    {
-      name: 'فاطمة علي',
-      role: 'مالكة مشروع سكني',
-      company: 'مجمع السكن الفاخر',
-      image: 'https://i.pravatar.cc/150?img=47',
-      text: 'خدمة احترافية ومتابعة دقيقة. فريق العمل متجاوب جداً وساعدنا في إنجاز المشروع في الوقت المحدد.',
-      rating: 5
-    },
-    {
-      name: 'خالد حسن',
-      role: 'مستثمر',
-      company: 'شركة الاستثمار العقاري',
-      image: 'https://i.pravatar.cc/150?img=33',
-      text: 'أفضل نظام إدارة مقاولات استخدمته. الشفافية والدقة في المتابعة ممتازة.',
-      rating: 5
-    },
-  ];
-
-  const howItWorks = [
-    {
-      step: 1,
-      title: 'سجّل حسابك',
-      desc: 'أنشئ حسابك كعميل أو مقاول في دقائق',
-      icon: '👤'
-    },
-    {
-      step: 2,
-      title: 'أضف مشروعك',
-      desc: 'أضف تفاصيل مشروعك وحدد المتطلبات',
-      icon: '📝'
-    },
-    {
-      step: 3,
-      title: 'راقب التقدم',
-      desc: 'تابع تقدم مشروعك في الوقت الفعلي',
-      icon: '📊'
-    },
-    {
-      step: 4,
-      title: 'احصل على النتائج',
-      desc: 'استلم مشروعك المكتمل بجودة عالية',
-      icon: '✅'
-    },
-  ];
-
-  const faqs = [
-    {
-      question: 'كيف يمكنني التسجيل في النظام؟',
-      answer: 'يمكنك التسجيل بسهولة من خلال الضغط على زر "إنشاء حساب" في الصفحة الرئيسية واختيار نوع الحساب (عميل أو مقاول) ثم ملء البيانات المطلوبة.'
-    },
-    {
-      question: 'ما هي أنواع المشاريع التي يمكن إدارتها؟',
-      answer: 'يمكن إدارة جميع أنواع المشاريع الإنشائية مثل المباني السكنية والإدارية، المراكز التجارية، البنية التحتية، وغيرها من المشاريع.'
-    },
-    {
-      question: 'هل النظام مجاني؟',
-      answer: 'نعم، النظام مجاني للاستخدام. يمكنك إنشاء حساب والبدء في إدارة مشاريعك فوراً دون أي رسوم.'
-    },
-    {
-      question: 'كيف يمكنني التواصل مع الدعم الفني؟',
-      answer: 'يمكنك التواصل معنا من خلال نموذج التواصل في الصفحة الرئيسية، أو عبر البريد الإلكتروني. فريقنا متاح لمساعدتك في أي وقت.'
-    },
-    {
-      question: 'هل يمكن للمقاولين إدارة عدة مشاريع في نفس الوقت؟',
-      answer: 'نعم، يمكن للمقاولين إدارة عدد غير محدود من المشاريع في نفس الوقت. النظام يوفر لوحة تحكم شاملة لمتابعة جميع المشاريع.'
-    },
-    {
-      question: 'كيف يتم ضمان أمان البيانات؟',
-      answer: 'نستخدم أحدث تقنيات الأمان والتشفير لحماية بياناتك. جميع المعلومات محمية ومشفرة وفق أعلى المعايير الأمنية.'
     },
   ];
 
@@ -782,7 +700,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works Section */}
+      {/* Quick Links Section */}
       <section style={{
         background: BRAND.light,
         padding: '100px 32px',
@@ -801,7 +719,7 @@ export default function LandingPage() {
             marginBottom: 16,
             letterSpacing: '-1px'
           }}>
-            كيف يعمل النظام؟
+            استكشف المزيد
           </h2>
           <p style={{
             fontSize: 20,
@@ -810,7 +728,7 @@ export default function LandingPage() {
             margin: '0 auto',
             lineHeight: 1.8
           }}>
-            خطوات بسيطة لبدء إدارة مشاريعك بكفاءة
+            اكتشف مشاريعنا، شهادات عملائنا، وكيف يعمل النظام
           </p>
         </div>
 
@@ -819,12 +737,18 @@ export default function LandingPage() {
           margin: '0 auto',
           display: 'grid',
           gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
-          gap: isMobile ? 32 : 24,
+          gap: isMobile ? 24 : 32,
           padding: isMobile ? '0 20px' : '0'
         }}>
-          {howItWorks.map((item, index) => (
+          {[
+            { icon: '🏗️', title: 'المشاريع', desc: 'استعرض مشاريعنا المميزة', link: '/projects', color: BRAND.primary },
+            { icon: '⭐', title: 'الشهادات', desc: 'آراء عملائنا المميزين', link: '/testimonials', color: BRAND.accent },
+            { icon: '❓', title: 'الأسئلة الشائعة', desc: 'إجابات على أسئلتك', link: '/faq', color: '#f59e0b' },
+            { icon: '📖', title: 'كيف يعمل النظام', desc: 'خطوات بسيطة للبدء', link: '/how-it-works', color: '#10b981' },
+          ].map((item, index) => (
             <div
               key={index}
+              onClick={() => navigate(item.link)}
               style={{
                 background: '#fff',
                 borderRadius: 24,
@@ -833,12 +757,14 @@ export default function LandingPage() {
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                 border: '2px solid transparent',
                 transition: 'all 0.4s ease',
-                position: 'relative'
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden'
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.borderColor = BRAND.accent;
+                e.currentTarget.style.borderColor = item.color;
                 e.currentTarget.style.transform = 'translateY(-10px)';
-                e.currentTarget.style.boxShadow = `0 12px 40px ${BRAND.accent}30`;
+                e.currentTarget.style.boxShadow = `0 12px 40px ${item.color}30`;
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.borderColor = 'transparent';
@@ -850,32 +776,22 @@ export default function LandingPage() {
                 width: 80,
                 height: 80,
                 borderRadius: '50%',
-                background: BRAND.gradientLight,
+                background: `${item.color}15`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 36,
+                fontSize: 40,
                 margin: '0 auto 24px',
-                boxShadow: `0 8px 25px ${BRAND.accent}40`
-              }}>
+                transition: 'all 0.3s ease'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+              }}
+              >
                 {item.icon}
-              </div>
-              <div style={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                background: BRAND.accent,
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 900,
-                fontSize: 18,
-                position: 'absolute',
-                top: 20,
-                right: 20
-              }}>
-                {item.step}
               </div>
               <h3 style={{
                 fontSize: 22,
@@ -893,313 +809,16 @@ export default function LandingPage() {
               }}>
                 {item.desc}
               </p>
-              {item.step === 1 && (
-                <button
-                  onClick={() => navigate('/login')}
-                  style={{
-                    width: '100%',
-                    padding: '12px 24px',
-                    background: BRAND.gradientLight,
-                    color: '#fff',
-                    border: 0,
-                    borderRadius: 12,
-                    fontSize: 15,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(42, 157, 143, 0.4)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                >
-                  ابدأ الآن →
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Projects Section */}
-      <section id="section-3" style={{
-        background: BRAND.dark,
-        padding: '100px 32px',
-        color: '#fff'
-      }}>
-        <div style={{
-          maxWidth: 1400,
-          margin: '0 auto',
-          textAlign: 'center',
-          marginBottom: 60
-        }}>
-          <h2 style={{
-            fontSize: 48,
-            fontWeight: 900,
-            marginBottom: 16,
-            letterSpacing: '-1px'
-          }}>
-            مشاريعنا المميزة
-          </h2>
-          <p style={{
-            fontSize: 20,
-            color: 'rgba(255,255,255,0.7)',
-            maxWidth: 700,
-            margin: '0 auto'
-          }}>
-            نفتخر بمشاريعنا الناجحة التي تجسد رؤيتنا في التميز
-          </p>
-        </div>
-
-        <div style={{
-          maxWidth: 1400,
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-          gap: 32
-        }}>
-          {projects.map((project, index) => (
-            <div
-              key={index}
-              onClick={() => navigate('/showcase')}
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                borderRadius: 24,
-                overflow: 'hidden',
-                border: '1px solid rgba(255,255,255,0.1)',
-                transition: 'all 0.4s ease',
-                backdropFilter: 'blur(10px)',
-                cursor: 'pointer'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-10px)';
-                e.currentTarget.style.boxShadow = '0 20px 60px rgba(0,0,0,0.5)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
               <div style={{
-                height: 280,
-                overflow: 'hidden',
-                position: 'relative'
-              }}>
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    transition: 'transform 0.5s ease'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.1)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                  }}
-                />
-                <div style={{
-                  position: 'absolute',
-                  top: 20,
-                  right: 20,
-                  background: BRAND.gradientLight,
-                  padding: '8px 16px',
-                  borderRadius: 50,
-                  fontSize: 13,
-                  fontWeight: 700
-                }}>
-                  {project.category}
-                </div>
-              </div>
-              <div style={{ padding: 32 }}>
-                <h3 style={{
-                  fontSize: 24,
-                  fontWeight: 800,
-                  marginBottom: 16
-                }}>
-                  {project.title}
-                </h3>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)',
-                  gap: 16,
-                  paddingTop: 20,
-                  borderTop: '1px solid rgba(255,255,255,0.1)',
-                  marginBottom: 20
-                }}>
-                  {Object.entries(project.stats).map(([key, value]) => (
-                    <div key={key}>
-                      <div style={{
-                        fontSize: 18,
-                        fontWeight: 700,
-                        color: BRAND.accent,
-                        marginBottom: 4
-                      }}>
-                        {value}
-                      </div>
-                      <div style={{
-                        fontSize: 12,
-                        color: 'rgba(255,255,255,0.6)'
-                      }}>
-                        {key === 'area' ? 'المساحة' : key === 'floors' ? 'الطوابق' : 'المدة'}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate('/showcase');
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '12px 24px',
-                    background: BRAND.gradientLight,
-                    color: '#fff',
-                    border: 0,
-                    borderRadius: 12,
-                    fontSize: 16,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    marginTop: 8
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(42, 157, 143, 0.4)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                >
-                  عرض التفاصيل →
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section style={{
-        background: '#fff',
-        padding: '100px 32px',
-        position: 'relative'
-      }}>
-        <div style={{
-          maxWidth: 1400,
-          margin: '0 auto',
-          textAlign: 'center',
-          marginBottom: 60
-        }}>
-          <h2 style={{
-            fontSize: 48,
-            fontWeight: 900,
-            color: BRAND.primary,
-            marginBottom: 16,
-            letterSpacing: '-1px'
-          }}>
-            ماذا يقول عملاؤنا؟
-          </h2>
-          <p style={{
-            fontSize: 20,
-            color: BRAND.muted,
-            maxWidth: 700,
-            margin: '0 auto',
-            lineHeight: 1.8
-          }}>
-            آراء حقيقية من عملائنا المميزين
-          </p>
-        </div>
-
-        <div style={{
-          maxWidth: 1400,
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
-          gap: isMobile ? 24 : 32,
-          padding: isMobile ? '0 20px' : '0'
-        }}>
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={index}
-              style={{
-                background: BRAND.light,
-                borderRadius: 24,
-                padding: 40,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                border: '1px solid rgba(0,0,0,0.05)',
-                transition: 'all 0.4s ease',
-                position: 'relative'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-8px)';
-                e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.15)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
-              }}
-            >
-              <div style={{
-                display: 'flex',
-                gap: 8,
-                marginBottom: 16
-              }}>
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <span key={i} style={{ fontSize: 18, color: '#fbbf24' }}>⭐</span>
-                ))}
-              </div>
-              <p style={{
-                fontSize: 16,
-                color: BRAND.muted,
-                lineHeight: 1.8,
-                marginBottom: 24,
-                fontStyle: 'italic'
-              }}>
-                "{testimonial.text}"
-              </p>
-              <div style={{
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
-                gap: 16,
-                paddingTop: 24,
-                borderTop: '1px solid rgba(0,0,0,0.1)'
+                gap: 8,
+                color: item.color,
+                fontWeight: 700,
+                fontSize: 15
               }}>
-                <img
-                  src={testimonial.image}
-                  alt={testimonial.name}
-                  style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: '50%',
-                    objectFit: 'cover'
-                  }}
-                />
-                <div>
-                  <div style={{
-                    fontSize: 18,
-                    fontWeight: 700,
-                    color: BRAND.primary,
-                    marginBottom: 4
-                  }}>
-                    {testimonial.name}
-                  </div>
-                  <div style={{
-                    fontSize: 14,
-                    color: BRAND.muted
-                  }}>
-                    {testimonial.role} - {testimonial.company}
-                  </div>
-                </div>
+                <span>اكتشف المزيد</span>
+                <span>→</span>
               </div>
             </div>
           ))}
@@ -1413,109 +1032,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section style={{
-        background: BRAND.light,
-        padding: '100px 32px'
-      }}>
-        <div style={{
-          maxWidth: 900,
-          margin: '0 auto',
-          textAlign: 'center',
-          marginBottom: 60
-        }}>
-          <h2 style={{
-            fontSize: 48,
-            fontWeight: 900,
-            color: BRAND.primary,
-            marginBottom: 16,
-            letterSpacing: '-1px'
-          }}>
-            الأسئلة الشائعة
-          </h2>
-          <p style={{
-            fontSize: 20,
-            color: BRAND.muted,
-            maxWidth: 700,
-            margin: '0 auto',
-            lineHeight: 1.8
-          }}>
-            إجابات على أكثر الأسئلة شيوعاً
-          </p>
-        </div>
-
-        <div style={{
-          maxWidth: 900,
-          margin: '0 auto',
-          display: 'grid',
-          gap: 16
-        }}>
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              style={{
-                background: '#fff',
-                borderRadius: 16,
-                overflow: 'hidden',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-                border: '1px solid rgba(0,0,0,0.05)',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.05)';
-              }}
-            >
-              <button
-                onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                style={{
-                  width: '100%',
-                  padding: '24px 32px',
-                  background: 'transparent',
-                  border: 0,
-                  textAlign: 'right',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 16
-                }}
-              >
-                <h3 style={{
-                  fontSize: 18,
-                  fontWeight: 700,
-                  color: BRAND.primary,
-                  margin: 0,
-                  flex: 1
-                }}>
-                  {faq.question}
-                </h3>
-                <span style={{
-                  fontSize: 24,
-                  color: BRAND.accent,
-                  transition: 'transform 0.3s ease',
-                  transform: openFaqIndex === index ? 'rotate(180deg)' : 'rotate(0deg)'
-                }}>
-                  ▼
-                </span>
-              </button>
-              {openFaqIndex === index && (
-                <div style={{
-                  padding: '0 32px 24px',
-                  fontSize: 16,
-                  color: BRAND.muted,
-                  lineHeight: 1.8,
-                  animation: 'fadeInUp 0.3s ease'
-                }}>
-                  {faq.answer}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* Footer */}
       <footer style={{
