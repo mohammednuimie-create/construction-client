@@ -143,107 +143,21 @@ function AuthRouter() {
         pointerEvents: 'none'
       }} />
 
-      {/* Main Container */}
+      {/* Main Container - Centered */}
       <div style={{
         width: '100%',
-        maxWidth: 1400,
-        margin: '0 auto',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         padding: isMobile ? '40px 20px' : '60px 40px',
         position: 'relative',
         zIndex: 1,
-        gap: isMobile ? 0 : 60
+        minHeight: '100vh'
       }}>
-        {/* Left Side - Visual Content */}
-        {!isMobile && (
-          <div style={{
-            flex: 1,
-            maxWidth: 500,
-            position: 'relative',
-            zIndex: 1,
-            textAlign: 'center',
-            color: '#fff'
-          }}>
-            <div style={{
-              width: 120,
-              height: 120,
-              borderRadius: 28,
-              background: 'rgba(255, 255, 255, 0.15)',
-              backdropFilter: 'blur(15px)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 60,
-              margin: '0 auto 40px',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-              animation: 'float 6s ease-in-out infinite',
-              border: '2px solid rgba(255, 255, 255, 0.2)'
-            }}>
-              🏗️
-            </div>
-            <h1 style={{
-              fontSize: 48,
-              fontWeight: 900,
-              marginBottom: 24,
-              letterSpacing: '-1px',
-              lineHeight: 1.2,
-              textShadow: '0 4px 20px rgba(0, 0, 0, 0.2)'
-            }}>
-              المستقبل لإدارة المقاولات
-            </h1>
-            <p style={{
-              fontSize: 20,
-              lineHeight: 1.8,
-              opacity: 0.95,
-              marginBottom: 50,
-              textShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
-            }}>
-              نظام متكامل لإدارة مشاريعك بكفاءة واحترافية
-            </p>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 20
-            }}>
-              {[
-                { icon: '⚡', text: 'سرعة التنفيذ', color: '#fbbf24' },
-                { icon: '🔒', text: 'أمان عالي', color: '#10b981' },
-                { icon: '📊', text: 'تقارير شاملة', color: '#3b82f6' },
-                { icon: '💎', text: 'جودة عالية', color: '#f59e0b' }
-              ].map((item, idx) => (
-                <div key={idx} style={{
-                  background: 'rgba(255, 255, 255, 0.12)',
-                  backdropFilter: 'blur(15px)',
-                  borderRadius: 20,
-                  padding: 24,
-                  border: '2px solid rgba(255, 255, 255, 0.2)',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                  e.currentTarget.style.transform = 'translateY(-5px)';
-                  e.currentTarget.style.boxShadow = '0 12px 35px rgba(0, 0, 0, 0.25)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
-                }}
-                >
-                  <div style={{ fontSize: 36, marginBottom: 12 }}>{item.icon}</div>
-                  <div style={{ fontSize: 15, fontWeight: 700 }}>{item.text}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Right Side - Login Form */}
+        {/* Login Form - Centered */}
         <div style={{
-          flex: isMobile ? 1 : '0 0 480px',
+          width: '100%',
+          maxWidth: 500,
           position: 'relative',
           zIndex: 1
         }}>
