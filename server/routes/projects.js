@@ -23,12 +23,18 @@ router.get('/', async (req, res) => {
     // عزل البيانات: المستخدم يرى فقط بياناته
     if (req.userRole === 'contractor') {
       // المقاول يرى فقط مشاريعه
-      query.contractor = req.userId;
-      console.log(`🔒 [Projects GET] Filtering by contractor: ${req.userId}`);
+      // تحويل userId إلى ObjectId للتأكد من المطابقة
+      query.contractor = mongoose.Types.ObjectId.isValid(req.userId) 
+        ? new mongoose.Types.ObjectId(req.userId) 
+        : req.userId;
+      console.log(`🔒 [Projects GET] Filtering by contractor: ${req.userId} (type: ${typeof req.userId})`);
     } else if (req.userRole === 'client') {
       // العميل يرى فقط مشاريعه
-      query.client = req.userId;
-      console.log(`🔒 [Projects GET] Filtering by client: ${req.userId}`);
+      // تحويل userId إلى ObjectId للتأكد من المطابقة
+      query.client = mongoose.Types.ObjectId.isValid(req.userId) 
+        ? new mongoose.Types.ObjectId(req.userId) 
+        : req.userId;
+      console.log(`🔒 [Projects GET] Filtering by client: ${req.userId} (type: ${typeof req.userId})`);
     } else {
       // إذا كان الدور غير معروف، لا نرجع أي بيانات
       console.log(`⚠️ [Projects GET] Unknown role: ${req.userRole} - returning empty array`);
