@@ -24,6 +24,8 @@ export default function AddProjectAndRequests(){
     notes: ''
   });
   const [activeTab, setActiveTab] = useState(1); // التبويبة النشطة
+  const [showProjectForm, setShowProjectForm] = useState(false); // إظهار/إخفاء النموذج
+  const [completedTabs, setCompletedTabs] = useState(new Set()); // التبويبات المكتملة
   const [clientRequests, setClientRequests] = useState([]);
   const [clients, setClients] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -241,6 +243,15 @@ export default function AddProjectAndRequests(){
   const handleProjectInput = (e) => {
     setProjectForm({ ...projectForm, [e.target.name]: e.target.value });
   };
+  
+  // عند الانتقال بين التبويبات، نحدد التبويبة السابقة كمكتملة
+  const handleTabChange = (tabId) => {
+    if (activeTab < tabId) {
+      // الانتقال للأمام - نحدد التبويبة الحالية كمكتملة
+      setCompletedTabs(prev => new Set([...prev, activeTab]));
+    }
+    setActiveTab(tabId);
+  };
 
   const saveProject = async (e) => {
     e.preventDefault();
@@ -302,6 +313,8 @@ export default function AddProjectAndRequests(){
       setCrews([]);
       setImages([]);
       setActiveTab(1);
+      setCompletedTabs(new Set());
+      setShowProjectForm(false);
     } catch (err) {
       notifications.error('خطأ', err.message || 'حدث خطأ أثناء حفظ المشروع');
       console.error('Error creating project:', err);
@@ -420,86 +433,253 @@ export default function AddProjectAndRequests(){
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
+            justifyContent: 'space-between',
             marginBottom: 24,
             paddingBottom: 16,
             borderBottom: '2px solid ' + BRAND.light
           }}>
             <div style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              background: BRAND.gradient,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 20
+              gap: 12
             }}>
-              ➕
+              <div style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                background: BRAND.gradient,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 20
+              }}>
+                ➕
+              </div>
+              <h3 style={{
+                margin: 0,
+                color: BRAND.primary,
+                fontSize: 22,
+                fontWeight: 800
+              }}>
+                إضافة مشروع جديد
+              </h3>
             </div>
-            <h3 style={{
-              margin: 0,
-              color: BRAND.primary,
-              fontSize: 22,
-              fontWeight: 800
-            }}>
-              إضافة مشروع جديد
-            </h3>
-          </div>
-          
-          {/* Tabs */}
-          <div style={{
-            display: 'flex',
-            gap: 8,
-            marginBottom: 24,
-            borderBottom: '2px solid ' + BRAND.light,
-            overflowX: 'auto'
-          }}>
-            {[
-              { id: 1, label: 'معلومات أساسية', icon: '📋' },
-              { id: 2, label: 'المواد اللازمة', icon: '🧱' },
-              { id: 3, label: 'المهندسين والمتعاقدين', icon: '👷' },
-              { id: 4, label: 'صور المشروع', icon: '📷' },
-              { id: 5, label: 'معلومات إضافية', icon: '⚙️' }
-            ].map(tab => (
+            {!showProjectForm && (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => setShowProjectForm(true)}
                 style={{
-                  padding: '12px 20px',
+                  padding: '12px 24px',
+                  background: BRAND.gradient,
+                  color: '#fff',
                   border: 'none',
-                  background: 'transparent',
-                  color: activeTab === tab.id ? BRAND.primary : BRAND.muted,
-                  fontWeight: activeTab === tab.id ? 700 : 500,
+                  borderRadius: 12,
+                  fontWeight: 700,
                   fontSize: 14,
                   cursor: 'pointer',
-                  borderBottom: activeTab === tab.id ? `3px solid ${BRAND.accent}` : '3px solid transparent',
-                  transition: 'all 0.3s ease',
-                  whiteSpace: 'nowrap',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6
+                  boxShadow: '0 4px 12px rgba(30,58,95,0.3)',
+                  transition: 'all 0.3s ease'
                 }}
                 onMouseOver={e => {
-                  if (activeTab !== tab.id) {
-                    e.currentTarget.style.color = BRAND.primary;
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(30,58,95,0.4)';
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(30,58,95,0.3)';
+                }}
+              >
+                ➕ إضافة مشروع
+              </button>
+            )}
+          </div>
+          
+          {showProjectForm && (
+            <>
+              {/* زر الحفظ في الأعلى */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  saveProject(e);
+                }}
+                disabled={isSubmitting}
+                style={{
+                  width: '100%',
+                  background: BRAND.gradient,
+                  color: '#fff',
+                  border: 0,
+                  borderRadius: 12,
+                  padding: '14px 24px',
+                  fontWeight: 700,
+                  fontSize: 16,
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 4px 15px rgba(42,157,143,0.3)',
+                  transition: 'all 0.3s ease',
+                  opacity: isSubmitting ? 0.7 : 1,
+                  marginBottom: 32
+                }}
+                onMouseOver={e => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(42,157,143,0.4)';
                   }
                 }}
                 onMouseOut={e => {
-                  if (activeTab !== tab.id) {
-                    e.currentTarget.style.color = BRAND.muted;
-                  }
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(42,157,143,0.3)';
                 }}
               >
-                <span>{tab.icon}</span>
-                <span>{tab.label}</span>
+                {isSubmitting ? '⏳ جاري الحفظ...' : '✓ حفظ المشروع'}
               </button>
-            ))}
-          </div>
-          
-          <form onSubmit={saveProject}>
-            {/* Tab 1: معلومات أساسية */}
-            {activeTab === 1 && (
+              
+              {/* Progress Indicator - دوائر متسلسلة */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 32,
+                padding: '20px',
+                background: BRAND.light,
+                borderRadius: 16,
+                position: 'relative'
+              }}>
+                {[
+                  { id: 1, label: 'معلومات أساسية', icon: '📋' },
+                  { id: 2, label: 'المواد', icon: '🧱' },
+                  { id: 3, label: 'المهندسين', icon: '👷' },
+                  { id: 4, label: 'الصور', icon: '📷' },
+                  { id: 5, label: 'إضافية', icon: '⚙️' }
+                ].map((tab, index) => (
+                  <React.Fragment key={tab.id}>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 8,
+                      flex: 1,
+                      position: 'relative',
+                      zIndex: 2
+                    }}>
+                      <div
+                        onClick={() => handleTabChange(tab.id)}
+                        style={{
+                          width: 50,
+                          height: 50,
+                          borderRadius: '50%',
+                          background: completedTabs.has(tab.id) 
+                            ? BRAND.accent 
+                            : activeTab === tab.id 
+                            ? BRAND.gradient 
+                            : '#e5e7eb',
+                          color: completedTabs.has(tab.id) || activeTab === tab.id ? '#fff' : BRAND.muted,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: completedTabs.has(tab.id) ? 24 : 20,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          border: completedTabs.has(tab.id) || activeTab === tab.id ? '3px solid #fff' : '3px solid transparent',
+                          boxShadow: activeTab === tab.id ? '0 4px 12px rgba(42,157,143,0.4)' : 'none'
+                        }}
+                        onMouseOver={e => {
+                          if (activeTab !== tab.id) {
+                            e.currentTarget.style.transform = 'scale(1.1)';
+                          }
+                        }}
+                        onMouseOut={e => {
+                          if (activeTab !== tab.id) {
+                            e.currentTarget.style.transform = 'scale(1)';
+                          }
+                        }}
+                      >
+                        {completedTabs.has(tab.id) ? '✓' : tab.icon}
+                      </div>
+                      <div style={{
+                        fontSize: 11,
+                        color: activeTab === tab.id ? BRAND.primary : BRAND.muted,
+                        fontWeight: activeTab === tab.id ? 700 : 500,
+                        textAlign: 'center',
+                        maxWidth: 80
+                      }}>
+                        {tab.label}
+                      </div>
+                    </div>
+                    {index < 4 && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: `calc(25px + ${(index + 1) * (100 / 5)}%)`,
+                        width: `calc(${100 / 5}% - 50px)`,
+                        height: 3,
+                        background: completedTabs.has(tab.id) || activeTab > tab.id
+                          ? BRAND.accent
+                          : '#e5e7eb',
+                        transform: 'translateY(-50%)',
+                        zIndex: 1,
+                        transition: 'all 0.3s ease'
+                      }} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+              
+              {/* Tabs */}
+              <div style={{
+                display: 'flex',
+                gap: 8,
+                marginBottom: 24,
+                borderBottom: '2px solid ' + BRAND.light,
+                overflowX: 'auto'
+              }}>
+                {[
+                  { id: 1, label: 'معلومات أساسية', icon: '📋' },
+                  { id: 2, label: 'المواد اللازمة', icon: '🧱' },
+                  { id: 3, label: 'المهندسين والمتعاقدين', icon: '👷' },
+                  { id: 4, label: 'صور المشروع', icon: '📷' },
+                  { id: 5, label: 'معلومات إضافية', icon: '⚙️' }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => handleTabChange(tab.id)}
+                    style={{
+                      padding: '12px 20px',
+                      border: 'none',
+                      background: 'transparent',
+                      color: activeTab === tab.id ? BRAND.primary : BRAND.muted,
+                      fontWeight: activeTab === tab.id ? 700 : 500,
+                      fontSize: 14,
+                      cursor: 'pointer',
+                      borderBottom: activeTab === tab.id ? `3px solid ${BRAND.accent}` : '3px solid transparent',
+                      transition: 'all 0.3s ease',
+                      whiteSpace: 'nowrap',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6
+                    }}
+                    onMouseOver={e => {
+                      if (activeTab !== tab.id) {
+                        e.currentTarget.style.color = BRAND.primary;
+                      }
+                    }}
+                    onMouseOut={e => {
+                      if (activeTab !== tab.id) {
+                        e.currentTarget.style.color = BRAND.muted;
+                      }
+                    }}
+                  >
+                    <span>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
+              </div>
+              
+              <form onSubmit={saveProject} style={{ display: 'none' }}>
+                <button type="submit" />
+              </form>
+              
+              {/* Tab 1: معلومات أساسية */}
+              {activeTab === 1 && (
               <div style={{ display: 'grid', gap: 16 }}>
                 <div>
                   <label style={{
@@ -1295,38 +1475,22 @@ export default function AddProjectAndRequests(){
                   />
                 </div>
               </div>
-            )}
-            
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              style={{
-                background: BRAND.gradient,
-                color: '#fff',
-                border: 0,
-                borderRadius: 12,
-                padding: '14px 24px',
-                fontWeight: 700,
-                fontSize: 16,
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 15px rgba(42,157,143,0.3)',
-                transition: 'all 0.3s ease',
-                opacity: isSubmitting ? 0.7 : 1
-              }}
-              onMouseOver={e => {
-                if (!isSubmitting) {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(42,157,143,0.4)';
-                }
-              }}
-              onMouseOut={e => {
-                e.currentTarget.style.transform = 'none';
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(42,157,143,0.3)';
-              }}
-            >
-              {isSubmitting ? '⏳ جاري الحفظ...' : '✓ حفظ المشروع'}
-            </button>
-          </form>
+              )}
+              </div>
+            </>
+          )}
+          
+          {!showProjectForm && (
+            <div style={{
+              textAlign: 'center',
+              padding: '60px 20px',
+              color: BRAND.muted
+            }}>
+              <div style={{ fontSize: 64, marginBottom: 16 }}>📋</div>
+              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>ابدأ بإضافة مشروع جديد</div>
+              <div style={{ fontSize: 14 }}>انقر على زر "إضافة مشروع" أعلاه للبدء</div>
+            </div>
+          )}
         </div>
 
         {/* Client Requests */}
