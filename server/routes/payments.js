@@ -14,12 +14,15 @@ router.get('/', async (req, res) => {
     
     // عزل البيانات: إذا كان المستخدم مسجل دخوله، يرى فقط مدفوعاته
     if (req.user && req.userRole === 'contractor') {
-      // المقاول يرى فقط المدفوعات لمشاريعه
+      // المقاول يرى فقط المدفوعات التي أنشأها أو لمشترياته
       const userProjects = await Project.find({ contractor: req.userId }).select('_id');
       const projectIds = userProjects.map(p => p._id);
       const purchases = await Purchase.find({ project: { $in: projectIds } }).select('_id');
       const purchaseIds = purchases.map(p => p._id);
-      query.purchase = { $in: purchaseIds };
+      query.$or = [
+        { createdBy: req.userId },
+        { purchase: { $in: purchaseIds } }
+      ];
     }
     
     if (supplier) query.supplier = supplier;
