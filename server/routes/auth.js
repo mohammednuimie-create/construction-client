@@ -235,21 +235,52 @@ router.post('/google/callback', async (req, res) => {
     
     if (!user) {
       // Check if user exists with same email
-      user = await User.findOne({ email: googleUser.email });
+      user = await User.findOne({ email: googleUser.email.toLowerCase().trim() });
       
       if (user) {
-        // Link Google account to existing user
-        user.googleId = googleUser.id;
-        await user.save();
+        // Link Google account to existing user (if not already linked)
+        if (!user.googleId) {
+          user.googleId = googleUser.id;
+          try {
+            await user.save();
+          } catch (error) {
+            // If duplicate googleId error, find the user with this googleId
+            if (error.code === 11000 && error.keyPattern && error.keyPattern.googleId) {
+              user = await User.findOne({ googleId: googleUser.id });
+              if (!user) {
+                throw new Error('Failed to link Google account');
+              }
+            } else {
+              throw error;
+            }
+          }
+        }
       } else {
         // Create new user
-        user = new User({
-          name: googleUser.name,
-          email: googleUser.email,
-          googleId: googleUser.id,
-          role: role || 'client'
-        });
-        await user.save();
+        try {
+          user = new User({
+            name: googleUser.name,
+            email: googleUser.email.toLowerCase().trim(),
+            googleId: googleUser.id,
+            role: role || 'client'
+          });
+          await user.save();
+        } catch (error) {
+          // If duplicate email error, user was created between our check and save
+          if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
+            // Try to find the user again
+            user = await User.findOne({ email: googleUser.email.toLowerCase().trim() });
+            if (user && !user.googleId) {
+              // Link Google account
+              user.googleId = googleUser.id;
+              await user.save();
+            } else if (!user) {
+              throw new Error('Failed to create user account');
+            }
+          } else {
+            throw error;
+          }
+        }
       }
     }
 
