@@ -31,7 +31,12 @@ const callApi = async (endpoint, method = 'GET', data = null, auth = true) => {
     const token = getToken();
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
+      console.log(`✅ [API] Sending token for ${method} ${endpoint}: ${token.substring(0, 20)}...`);
+    } else {
+      console.warn(`⚠️ [API] No token found for authenticated request: ${method} ${endpoint}`);
     }
+  } else {
+    console.log(`ℹ️ [API] Unauthenticated request: ${method} ${endpoint}`);
   }
 
   const config = {
