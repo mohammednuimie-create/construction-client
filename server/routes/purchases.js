@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Purchase = require('../models/Purchase');
 const Project = require('../models/Project');
@@ -17,7 +18,12 @@ router.get('/', async (req, res) => {
     }
     
     // المقاول يرى فقط المشتريات لمشاريعه
-    const userProjects = await Project.find({ contractor: req.userId }).select('_id');
+    // تحويل userId إلى ObjectId للتأكد من المطابقة
+    const contractorId = mongoose.Types.ObjectId.isValid(req.userId) 
+      ? new mongoose.Types.ObjectId(req.userId) 
+      : req.userId;
+    
+    const userProjects = await Project.find({ contractor: contractorId }).select('_id');
     const projectIds = userProjects.map(p => p._id);
     if (projectIds.length === 0) {
       return res.json([]); // لا توجد مشاريع = لا توجد مشتريات

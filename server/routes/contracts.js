@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Contract = require('../models/Contract');
 const { optionalAuth } = require('../middleware/auth');
@@ -18,10 +19,14 @@ router.get('/', async (req, res) => {
     // عزل البيانات: المستخدم يرى فقط عقوده
     if (req.userRole === 'contractor') {
       // المقاول يرى فقط عقوده
-      query.contractor = req.userId;
+      query.contractor = mongoose.Types.ObjectId.isValid(req.userId) 
+        ? new mongoose.Types.ObjectId(req.userId) 
+        : req.userId;
     } else if (req.userRole === 'client') {
       // العميل يرى فقط عقوده
-      query.client = req.userId;
+      query.client = mongoose.Types.ObjectId.isValid(req.userId) 
+        ? new mongoose.Types.ObjectId(req.userId) 
+        : req.userId;
     } else {
       return res.json([]); // دور غير معروف
     }
