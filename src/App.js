@@ -121,138 +121,129 @@ function AuthRouter() {
       display: 'flex',
       position: 'relative',
       overflow: 'hidden',
-      background: '#fff'
+      background: 'linear-gradient(135deg, #1e3a5f 0%, #2a9d8f 50%, #264653 100%)'
     }}>
-      {/* Left Side - Visual Content */}
-      {!isMobile && (
-        <div style={{
-          width: '50%',
-          background: 'linear-gradient(135deg, #1e3a5f 0%, #2a9d8f 50%, #264653 100%)',
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '60px',
-          overflow: 'hidden'
-        }}>
-          {/* Background Effects */}
+      {/* Unified Background Effects */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(circle at 20% 50%, rgba(42, 157, 143, 0.25) 0%, transparent 50%)',
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(circle at 80% 80%, rgba(30, 58, 95, 0.2) 0%, transparent 50%)',
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 70%)',
+        pointerEvents: 'none'
+      }} />
+
+      {/* Main Container */}
+      <div style={{
+        width: '100%',
+        maxWidth: 1400,
+        margin: '0 auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: isMobile ? '40px 20px' : '60px 40px',
+        position: 'relative',
+        zIndex: 1,
+        gap: isMobile ? 0 : 60
+      }}>
+        {/* Left Side - Visual Content */}
+        {!isMobile && (
           <div style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'radial-gradient(circle at 20% 50%, rgba(42, 157, 143, 0.3) 0%, transparent 50%)',
-            pointerEvents: 'none'
-          }} />
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'radial-gradient(circle at 80% 80%, rgba(30, 58, 95, 0.2) 0%, transparent 50%)',
-            pointerEvents: 'none'
-          }} />
-          
-          {/* Content */}
-          <div style={{
+            flex: 1,
+            maxWidth: 500,
             position: 'relative',
             zIndex: 1,
             textAlign: 'center',
-            color: '#fff',
-            maxWidth: 500
+            color: '#fff'
           }}>
             <div style={{
-              width: 100,
-              height: 100,
-              borderRadius: 24,
+              width: 120,
+              height: 120,
+              borderRadius: 28,
               background: 'rgba(255, 255, 255, 0.15)',
-              backdropFilter: 'blur(10px)',
+              backdropFilter: 'blur(15px)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 50,
-              margin: '0 auto 32px',
+              fontSize: 60,
+              margin: '0 auto 40px',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-              animation: 'float 6s ease-in-out infinite'
+              animation: 'float 6s ease-in-out infinite',
+              border: '2px solid rgba(255, 255, 255, 0.2)'
             }}>
               🏗️
             </div>
             <h1 style={{
-              fontSize: 42,
+              fontSize: 48,
               fontWeight: 900,
-              marginBottom: 20,
+              marginBottom: 24,
               letterSpacing: '-1px',
-              lineHeight: 1.2
+              lineHeight: 1.2,
+              textShadow: '0 4px 20px rgba(0, 0, 0, 0.2)'
             }}>
               المستقبل لإدارة المقاولات
             </h1>
             <p style={{
-              fontSize: 18,
+              fontSize: 20,
               lineHeight: 1.8,
               opacity: 0.95,
-              marginBottom: 40
+              marginBottom: 50,
+              textShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
             }}>
               نظام متكامل لإدارة مشاريعك بكفاءة واحترافية
             </p>
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 20,
-              marginTop: 40
+              gap: 20
             }}>
               {[
-                { icon: '⚡', text: 'سرعة التنفيذ' },
-                { icon: '🔒', text: 'أمان عالي' },
-                { icon: '📊', text: 'تقارير شاملة' },
-                { icon: '💎', text: 'جودة عالية' }
+                { icon: '⚡', text: 'سرعة التنفيذ', color: '#fbbf24' },
+                { icon: '🔒', text: 'أمان عالي', color: '#10b981' },
+                { icon: '📊', text: 'تقارير شاملة', color: '#3b82f6' },
+                { icon: '💎', text: 'جودة عالية', color: '#f59e0b' }
               ].map((item, idx) => (
                 <div key={idx} style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: 16,
-                  padding: 20,
-                  border: '1px solid rgba(255, 255, 255, 0.2)'
-                }}>
-                  <div style={{ fontSize: 32, marginBottom: 8 }}>{item.icon}</div>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>{item.text}</div>
+                  background: 'rgba(255, 255, 255, 0.12)',
+                  backdropFilter: 'blur(15px)',
+                  borderRadius: 20,
+                  padding: 24,
+                  border: '2px solid rgba(255, 255, 255, 0.2)',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = '0 12px 35px rgba(0, 0, 0, 0.25)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+                }}
+                >
+                  <div style={{ fontSize: 36, marginBottom: 12 }}>{item.icon}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700 }}>{item.text}</div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Right Side - Login Form */}
-      <div style={{
-        width: isMobile ? '100%' : '50%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: isMobile ? '40px 20px' : '60px',
-        background: '#f8fafc',
-        position: 'relative'
-      }}>
-        {/* Decorative elements */}
+        {/* Right Side - Login Form */}
         <div style={{
-          position: 'absolute',
-          top: '-100px',
-          left: '-100px',
-          width: '400px',
-          height: '400px',
-          background: 'radial-gradient(circle, rgba(42,157,143,0.05) 0%, transparent 70%)',
-          borderRadius: '50%',
-          zIndex: 0
-        }} />
-        <div style={{
-          position: 'absolute',
-          bottom: '-50px',
-          right: '-50px',
-          width: '300px',
-          height: '300px',
-          background: 'radial-gradient(circle, rgba(30,58,95,0.05) 0%, transparent 70%)',
-          borderRadius: '50%',
-          zIndex: 0
-        }} />
-        
-        <div style={{
-          width: '100%',
-          maxWidth: 480,
+          flex: isMobile ? 1 : '0 0 480px',
           position: 'relative',
           zIndex: 1
         }}>
@@ -277,11 +268,12 @@ function AuthRouter() {
         bottom: 16,
         width: '100%',
         textAlign: 'center',
-        color: '#64748b',
+        color: 'rgba(255, 255, 255, 0.7)',
         fontSize: 13,
         fontWeight: 500,
         zIndex: 10,
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        textShadow: '0 2px 10px rgba(0, 0, 0, 0.2)'
       }}>
         كل الحقوق محفوظة © {new Date().getFullYear()} – إدارة المقاولات
       </div>

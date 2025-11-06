@@ -194,41 +194,17 @@ export default function RoleLogin({ onLogin, onGuest, initialStep = 1, loading =
     <div style={{ 
       animation: "fadeIn 0.6s", 
       fontFamily: 'Cairo, system-ui, Arial',
-      minHeight: '100vh',
-      background: BRAND.gradient,
-      position: 'relative',
-      overflow: 'hidden',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '40px 20px'
+      width: '100%'
     }}>
-      {/* Background Effects */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: 'radial-gradient(circle at 20% 50%, rgba(42, 157, 143, 0.2) 0%, transparent 50%)',
-        pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: 'radial-gradient(circle at 80% 80%, rgba(30, 58, 95, 0.15) 0%, transparent 50%)',
-        pointerEvents: 'none'
-      }} />
-      
       {/* Main Content Container */}
       <div style={{
-        position: 'relative',
-        zIndex: 1,
         width: '100%',
-        maxWidth: 500,
-        background: 'rgba(255, 255, 255, 0.98)',
+        background: 'rgba(255, 255, 255, 0.95)',
         borderRadius: 32,
         padding: '48px 40px',
         boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
         backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.3)'
+        border: '2px solid rgba(255, 255, 255, 0.4)'
       }}>
       <style>{`
         @keyframes fadeIn {
